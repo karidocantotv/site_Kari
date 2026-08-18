@@ -34,12 +34,12 @@ function Header() {
     <div className="topbar"><div className="container topbar-inner"><span>✦ Cursos e projetos de artesanato com quem ensinou na televisão</span><span className="top-social">Instagram · YouTube · Facebook</span></div></div>
     <header className="nav">
       <div className="container nav-inner">
-        <Link href="/" className="logo logo-mark" aria-label="KARI Do Canto — início"><LogoImage /></Link>
+        <a href="/" className="logo logo-mark" aria-label="KARI Do Canto — início"><LogoImage /></a>
         <nav className="links" aria-label="Navegação principal">
-          <Link href="/">INÍCIO</Link><Link href="/sobre">SOBRE KARI</Link><Link href="/cursos">CURSOS</Link><Link href="/projetos">PROJETOS</Link><Link href="/blog">BLOG</Link><Link href="/contato">CONTATO</Link>
-          <Link className="btn primary" href="/cursos">ÁREA DO ALUNO</Link>
+          <a href="/">INÍCIO</a><a href="/sobre">SOBRE KARI</a><a href="/cursos">CURSOS</a><a href="/projetos">PROJETOS</a><a href="/blog">BLOG</a><a href="/contato">CONTATO</a>
+          <a className="btn primary" href="/cursos">ÁREA DO ALUNO</a>
         </nav>
-        <Link className="mobile-menu" href="/cursos" aria-label="Abrir área de cursos">☰</Link>
+        <a className="mobile-menu" href="/cursos" aria-label="Abrir área de cursos">☰</a>
       </div>
     </header>
   </>;
@@ -49,9 +49,9 @@ function Footer() {
   return <>
     <section className="newsletter"><div className="container newsletter-inner"><div><strong>Receba inspiração no seu e-mail.</strong><span>Dicas, novidades, projetos e novos cursos.</span></div><NewsletterForm /></div></section>
     <footer className="footer"><div className="container footer-grid">
-      <div><Link href="/" className="logo logo-footer" aria-label="KARI Do Canto — início"><LogoImage /></Link><p>Artesanato, criatividade e aprendizado para você criar com as próprias mãos.</p></div>
-      <div><h4>Navegação</h4><p><Link href="/sobre">Sobre Kari</Link><br/><Link href="/cursos">Cursos</Link><br/><Link href="/projetos">Projetos</Link><br/><Link href="/blog">Blog</Link></p></div>
-      <div><h4>Ajuda</h4><p><Link href="/contato">Contato</Link><br/><Link href="/politica-de-privacidade">Política de privacidade</Link><br/><Link href="/termos-de-uso">Termos de uso</Link></p></div>
+      <div><a href="/" className="logo logo-footer" aria-label="KARI Do Canto — início"><LogoImage /></a><p>Artesanato, criatividade e aprendizado para você criar com as próprias mãos.</p></div>
+      <div><h4>Navegação</h4><p><a href="/sobre">Sobre Kari</a><br/><a href="/cursos">Cursos</a><br/><a href="/projetos">Projetos</a><br/><a href="/blog">Blog</a></p></div>
+      <div><h4>Ajuda</h4><p><a href="/contato">Contato</a><br/><a href="/politica-de-privacidade">Política de privacidade</a><br/><a href="/termos-de-uso">Termos de uso</a></p></div>
       <div><h4>Siga nas redes</h4><p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p></div>
     </div><div className="container footer-bottom"><span>© 2026 KARI Do Canto. Todos os direitos reservados.</span><span>Build {buildShort}</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
   </>;
