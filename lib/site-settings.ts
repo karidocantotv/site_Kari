@@ -17,21 +17,25 @@ export async function getPublicSiteMedia(slots: string[]) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return {};
-  const supabase = createClient(url, key);
+  const supabase = createClient(url, key, {
+    global: {
+      fetch: (input, init = {}) => fetch(input, { ...init, cache: 'no-store' }),
+    },
+  });
   const { data } = await supabase
     .from('media_assets')
     .select('slot,path,alt_text,filename,created_at')
     .eq('bucket', 'site')
     .in('slot', slots)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: false });
 
   // A slot represents the active image for that location. If old uploads
   // remain in the library, the newest one must win deterministically.
   const result: Record<string, { url: string; alt: string; filename: string }> = {};
   for (const row of data ?? []) {
-    if (!row.slot) continue;
+    if (!row.slot || result[row.slot]) continue;
     result[row.slot] = {
-      url: supabase.storage.from('site').getPublicUrl(row.path).data.publicUrl,
+      url: `${supabase.storage.from('site').getPublicUrl(row.path).data.publicUrl}?v=${encodeURIComponent(row.created_at)}`,
       alt: row.alt_text ?? '',
       filename: row.filename ?? '',
     };

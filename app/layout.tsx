@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import NewsletterForm from '@/components/NewsletterForm';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 import LogoImage from '@/components/LogoImage';
+import MobileMenu from '@/components/MobileMenu';
 import { SITE_VERSION } from '@/lib/site-version';
 
 const buildVersion = process.env.CF_PAGES_COMMIT_SHA || process.env.NEXT_PUBLIC_BUILD_VERSION || 'dev';
@@ -50,7 +51,7 @@ function Header() {
           <a href="/">INÍCIO</a><a href="/sobre">SOBRE Kari</a><a href="/cursos">CURSOS</a><a href="/projetos">PROJETOS</a><a href="/blog">BLOG</a><a href="/contato">CONTATO</a>
           <a className="btn primary" href="/cursos">ÁREA DO ALUNO</a>
         </nav>
-        <a className="mobile-menu" href="/cursos" aria-label="Abrir área de cursos">☰</a>
+        <MobileMenu />
       </div>
     </header>
   </>;
