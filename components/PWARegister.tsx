@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { SITE_VERSION } from '@/lib/site-version';
 
 export default function PWARegister() {
   useEffect(() => {
@@ -17,7 +18,21 @@ export default function PWARegister() {
 
     const register = async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        const swUrl = `/sw.js?v=${encodeURIComponent(SITE_VERSION)}`;
+        const desiredScriptUrl = new URL(swUrl, window.location.origin).href;
+        const registrations = await navigator.serviceWorker.getRegistrations();
+
+        // Remove an older registration so the current build takes control immediately.
+        for (const registration of registrations) {
+          if (registration.scope === `${window.location.origin}/`) {
+            const activeUrl = registration.active?.scriptURL || registration.waiting?.scriptURL || registration.installing?.scriptURL || '';
+            if (activeUrl && activeUrl !== desiredScriptUrl) {
+              await registration.unregister();
+            }
+          }
+        }
+
+        const registration = await navigator.serviceWorker.register(swUrl, { scope: '/' });
         await registration.update();
 
         window.setInterval(() => {

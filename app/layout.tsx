@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   icons: { icon: '/icon.svg', apple: '/apple-icon.svg' },
   applicationName: 'Kari Do Canto',
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.webmanifest?v=1.5.2',
   themeColor: '#879681',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Kari Do Canto' },
 };

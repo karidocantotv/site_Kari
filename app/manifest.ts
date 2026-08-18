@@ -1,11 +1,15 @@
 import type { MetadataRoute } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: '/admin/dashboard',
     name: 'Painel Vital - Kari',
     short_name: 'Painel Vital - Kari',
     description: 'Painel administrativo do site Kari Do Canto.',
     start_url: '/admin/dashboard',
+    scope: '/',
     display: 'standalone',
     background_color: '#f8f4ec',
     theme_color: '#879681',

@@ -26,6 +26,7 @@ export default function Dashboard() {
           <div className="card"><div className="card-body"><span className="tag">Conteúdo</span><h3>Blog</h3><p>Gerenciar artigos, categorias, SEO e imagens.</p></div></div>
           <div className="card"><div className="card-body"><span className="tag">Conteúdo</span><h3>Projetos</h3><p>Gerenciar passo a passo e galerias.</p></div></div>
           <div className="card"><div className="card-body"><span className="tag">Produtos</span><h3>Cursos</h3><p>Estrutura pronta para catálogo e checkout.</p></div></div>
+          <div className="card"><div className="card-body"><span className="tag">Redes</span><h3>YouTube</h3><p>Acesse o canal da Kari e acompanhe os vídeos publicados.</p><a className="more" href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">ABRIR CANAL →</a></div></div>
           <div className="card"><div className="card-body"><span className="tag">CRM</span><h3>Leads</h3><p>Captura preparada para Supabase e futura gestão comercial.</p></div></div>
         </div>
         <section className="analytics-panel" aria-labelledby="analytics-title">
