@@ -1,4 +1,5 @@
 import './globals.css';
+import './logo.css';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import NewsletterForm from '@/components/NewsletterForm';
