@@ -42,3 +42,9 @@ Dynamic route `params` are handled as Promises across App Router pages and metad
 ## Cloudflare automated deployment
 
 The GitHub Actions deploy workflow uses the Cloudflare API to ensure the account has a `workers.dev` subdomain before running OpenNext deploy. This avoids interactive Wrangler onboarding in CI. The Cloudflare API requires a token with at least **Workers Scripts Write** permission for the account subdomain operation.
+
+## Painel de imagens
+
+O `/admin/dashboard` inclui o Gerenciador de Imagens integrado ao Supabase Storage. O administrador entra com um usuário do Supabase Auth e pode enviar, listar e excluir imagens nos buckets `site`, `karina`, `courses`, `projects` e `blog`, registrando também posição/uso e texto alternativo.
+
+Execute `supabase/media_migration.sql` uma vez no Supabase. Depois crie um usuário administrador em **Authentication → Users** no Supabase para entrar no painel.
