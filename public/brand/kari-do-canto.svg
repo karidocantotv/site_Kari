@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" role="img" aria-labelledby="title desc">
+  <title id="title">KARI Do Canto — Artesanato com Afeto</title>
+  <desc id="desc">Casa desenhada à mão com coração e folhagens, seguida do nome KARI Do Canto e da assinatura Artesanato com Afeto.</desc>
+  <g fill="none" stroke="#7d3f2d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M190 105 L245 45 L390 45 L445 105 L425 105 L425 190 L210 190 L210 105 Z"/>
+    <path d="M190 105 L245 45 M390 45 L445 105"/>
+    <path d="M245 45 L390 45"/>
+    <path d="M245 52 L225 103 M268 52 L246 103 M291 52 L269 103 M314 52 L292 103 M337 52 L315 103 M360 52 L338 103 M383 52 L361 103"/>
+    <rect x="232" y="120" width="30" height="38" rx="2"/><path d="M247 120 V158 M232 139 H262"/>
+    <rect x="294" y="120" width="30" height="38" rx="2"/><path d="M309 120 V158 M294 139 H324"/>
+    <rect x="365" y="88" width="30" height="38" rx="2"/><path d="M380 88 V126 M365 107 H395"/>
+    <rect x="365" y="145" width="30" height="38" rx="2"/><path d="M380 145 V183 M365 164 H395"/>
+    <path d="M315 190 V154 Q315 140 329 140 Q343 140 343 154 V190"/>
+    <path d="M178 183 C153 178 142 160 139 145 C153 147 168 153 180 165"/>
+    <path d="M176 166 C157 151 151 134 154 119 C166 126 176 140 180 154"/>
+    <path d="M432 184 C457 178 468 160 471 145 C457 147 442 153 430 165"/>
+    <path d="M434 166 C453 151 459 134 456 119 C444 126 434 140 430 154"/>
+    <path d="M318 26 C310 13 320 4 329 15 C338 4 348 13 340 26 L329 42 Z" fill="#7d3f2d" stroke="none"/>
+  </g>
+  <text x="320" y="222" text-anchor="middle" fill="#7d3f2d" font-family="Georgia, 'Times New Roman', serif" font-size="38" letter-spacing="3">KARI DO CANTO</text>
+  <text x="320" y="250" text-anchor="middle" fill="#9b5d49" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="2">Artesanato com Afeto</text>
+</svg>
