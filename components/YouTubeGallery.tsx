@@ -1,73 +1,69 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 const CHANNEL_URL = 'https://www.youtube.com/@KaridoCanto';
+type Video = { title: string; videoId: string };
 
-// Os IDs podem ser preenchidos quando selecionarmos os vídeos definitivos da Kari.
-// Enquanto isso, as imagens servem como referência visual e os cards levam ao canal oficial.
-const videos = [
-  { title: 'Passo a passo e técnicas de artesanato', image: '/images/blog-cestinho.jpg', videoId: '' },
-  { title: 'Dicas para criar com mais facilidade', image: '/images/blog-linhas.jpg', videoId: '' },
-  { title: 'Técnicas que fazem diferença no acabamento', image: '/images/blog-madeira.jpg', videoId: '' },
-  { title: 'Ideias para seus próximos projetos', image: '/images/blog-feltro.jpg', videoId: '' },
-  { title: 'Inspiração para colocar a criatividade em prática', image: '/images/course-scrapbook.jpg', videoId: '' },
-];
+function normalizeVideoId(value: string) {
+  const match = value.trim().match(/(?:v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/);
+  return match?.[1] ?? value.trim().replace(/[^A-Za-z0-9_-]/g, '').slice(0, 11);
+}
 
 export default function YouTubeGallery() {
+  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [channel, setChannel] = useState(CHANNEL_URL);
   const [active, setActive] = useState<string | null>(null);
-  const featured = videos[0];
-  const secondary = videos.slice(1);
 
-  return (
-    <>
-      <div className="video-gallery">
-        <button className="video-feature" onClick={() => setActive(featured.videoId || 'channel')} aria-label={`Assistir: ${featured.title}`}>
-          <Image src={featured.image} alt="Artesanato com Kari do Canto" fill sizes="(max-width: 800px) 100vw, 760px" priority={false} />
-          <span className="video-overlay" />
-          <span className="play-button">▶</span>
-          <span className="video-label">EM DESTAQUE</span>
-          <strong>{featured.title}</strong>
-        </button>
-        <div className="video-secondary">
-          {secondary.map((video) => (
-            <button className="video-small" key={video.title} onClick={() => setActive(video.videoId || 'channel')} aria-label={`Assistir: ${video.title}`}>
-              <span className="video-thumb"><Image src={video.image} alt="" fill sizes="(max-width: 800px) 50vw, 260px" /><span className="play-small">▶</span></span>
-              <strong>{video.title}</strong>
-            </button>
-          ))}
-        </div>
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.from('site_settings').select('key,value').like('key', 'youtube_%').then(({ data }) => {
+      const values = Object.fromEntries((data ?? []).map((row) => [row.key, row.value ?? '']));
+      setChannel(values.youtube_url || CHANNEL_URL);
+      const loaded = Array.from({ length: 5 }, (_, index) => {
+        const suffix = index === 0 ? '' : `_${index + 1}`;
+        const id = normalizeVideoId(values[`youtube_video_id${suffix}`] || '');
+        const enabled = values[`youtube_video_enabled${suffix}`] !== 'false';
+        return { title: values[`youtube_video_title${suffix}`] || `Vídeo ${index + 1}`, videoId: id, enabled };
+      }).filter((video) => video.enabled && video.videoId);
+      setVideos(loaded);
+    });
+  }, [supabase]);
+
+  const fallback = [
+    { title: 'Vídeos da Kari', videoId: '' },
+  ];
+  const visibleVideos = videos.length ? videos : fallback;
+  const featured = visibleVideos[0];
+  const secondary = visibleVideos.slice(1);
+
+  function openVideo(videoId: string) {
+    if (videoId) setActive(videoId);
+    else setActive('channel');
+  }
+
+  return <>
+    <div className="video-gallery">
+      <button className="video-feature" onClick={() => openVideo(featured.videoId)} aria-label={`Assistir: ${featured.title}`}>
+        {featured.videoId ? <Image src={`https://img.youtube.com/vi/${featured.videoId}/hqdefault.jpg`} alt={featured.title} fill sizes="(max-width: 800px) 100vw, 760px" /> : <div className="video-empty-image" />}
+        <span className="video-overlay" /><span className="play-button">▶</span>
+        <span className="video-label">EM DESTAQUE</span><strong>{featured.title}</strong>
+      </button>
+      {secondary.length > 0 && <div className="video-secondary">{secondary.map((video) => <button className="video-small" key={video.videoId} onClick={() => openVideo(video.videoId)} aria-label={`Assistir: ${video.title}`}>
+        <span className="video-thumb"><Image src={`https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`} alt={video.title} fill sizes="(max-width: 800px) 50vw, 260px" /><span className="play-small">▶</span></span>
+        <strong>{video.title}</strong>
+      </button>)}</div>}
+    </div>
+
+    <div className="center video-channel-cta"><a className="btn primary" href={channel} target="_blank" rel="noreferrer">VER CANAL NO YOUTUBE ↗</a></div>
+
+    {active && <div className="video-modal" role="dialog" aria-modal="true" aria-label="Vídeo do YouTube" onClick={() => setActive(null)}>
+      <div className="video-modal-inner" onClick={(e) => e.stopPropagation()}><button className="video-close" onClick={() => setActive(null)} aria-label="Fechar">×</button>
+        {active === 'channel' ? <div className="video-channel-placeholder"><span className="eyebrow">YouTube Kari do Canto</span><h3 className="serif">Cadastre os vídeos no Painel Vital.</h3><p>A Home exibe até 5 vídeos configurados no painel. Quando nenhum vídeo estiver cadastrado, o canal oficial continua disponível.</p><a className="btn primary" href={channel} target="_blank" rel="noreferrer">ABRIR O YOUTUBE ↗</a></div> : <div className="video-frame-wrap"><iframe src={`https://www.youtube-nocookie.com/embed/${active}?rel=0`} title="Vídeo Kari do Canto" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div>}
       </div>
-
-      <div className="center video-channel-cta">
-        <a className="btn primary" href={CHANNEL_URL} target="_blank" rel="noreferrer">VER CANAL NO YOUTUBE ↗</a>
-      </div>
-
-      {active && (
-        <div className="video-modal" role="dialog" aria-modal="true" aria-label="Vídeo do YouTube" onClick={() => setActive(null)}>
-          <div className="video-modal-inner" onClick={(e) => e.stopPropagation()}>
-            <button className="video-close" onClick={() => setActive(null)} aria-label="Fechar">×</button>
-            {active === 'channel' ? (
-              <div className="video-channel-placeholder">
-                <span className="eyebrow">YouTube Kari do Canto</span>
-                <h3 className="serif">Escolha um vídeo no canal da Kari.</h3>
-                <p>Os vídeos são carregados somente quando você escolhe assistir, mantendo a página leve.</p>
-                <a className="btn primary" href={CHANNEL_URL} target="_blank" rel="noreferrer">ABRIR O YOUTUBE ↗</a>
-              </div>
-            ) : (
-              <div className="video-frame-wrap">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${active}?autoplay=1&rel=0`}
-                  title="Vídeo Kari do Canto"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </>
-  );
+    </div>}
+  </>;
 }

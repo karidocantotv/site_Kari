@@ -48,3 +48,15 @@ The GitHub Actions deploy workflow uses the Cloudflare API to ensure the account
 O `/admin/dashboard` inclui o Gerenciador de Imagens integrado ao Supabase Storage. O administrador entra com um usuário do Supabase Auth e pode enviar, listar e excluir imagens nos buckets `site`, `karina`, `courses`, `projects` e `blog`, registrando também posição/uso e texto alternativo.
 
 Execute `supabase/media_migration.sql` uma vez no Supabase. Depois crie um usuário administrador em **Authentication → Users** no Supabase para entrar no painel.
+
+## V1.6 — Painel Vital e YouTube
+
+- Painel Vital com configuração de até 5 vídeos do YouTube.
+- A Home usa as capas dos vídeos cadastrados no painel.
+- O player do YouTube só é carregado após o clique e **não usa autoplay**.
+- Blog, Projetos e Cursos passaram a abrir suas páginas de configuração no Painel Vital.
+- Configurações básicas dessas seções (título, descrição e ativo na Home) são armazenadas em `site_settings`.
+
+### Supabase
+
+Execute uma vez o arquivo `supabase/site_settings_migration.sql` no SQL Editor do projeto Supabase antes de usar as novas configurações do Painel Vital.
