@@ -37,3 +37,8 @@ O workflow `.github/workflows/deploy-cloudflare.yml` executa instalação, typec
 ## Next.js 15 compatibility
 
 Dynamic route `params` are handled as Promises across App Router pages and metadata generation, matching Next.js 15.
+
+
+## Cloudflare automated deployment
+
+The GitHub Actions deploy workflow uses the Cloudflare API to ensure the account has a `workers.dev` subdomain before running OpenNext deploy. This avoids interactive Wrangler onboarding in CI. The Cloudflare API requires a token with at least **Workers Scripts Write** permission for the account subdomain operation.

@@ -33,10 +33,31 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Ensure Cloudflare Workers subdomain
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_URL="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/subdomain"
+
+          echo "Checking Cloudflare Workers account subdomain..."
+          RESPONSE=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$API_URL")
+          EXISTING=$(printf '%s' "$RESPONSE" | python3 -c 'import json,sys; d=json.load(sys.stdin); print((d.get("result") or {}).get("subdomain") or "")')
+
+          if [ -n "$EXISTING" ]; then
+            echo "Workers subdomain already configured: ${EXISTING}.workers.dev"
+          else
+            echo "No Workers subdomain found. Creating karidocanto..."
+            CREATE=$(curl -sS -X PUT "$API_URL" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data '{"subdomain":"karidocanto"}')
+            printf '%s' "$CREATE" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("success"), d.get("errors"); print("Created Workers subdomain:", d["result"]["subdomain"] + ".workers.dev")'
+          fi
 
       - name: Deploy
         run: npm run deploy
