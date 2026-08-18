@@ -42,9 +42,35 @@ export default function AdminMediaManager() {
     const {error:uploadError}=await supabase.storage.from(bucket).upload(path,file,{upsert:isSiteIdentity,contentType:file.type,cacheControl:isSiteIdentity?'0':'31536000'});
     if(uploadError){setError(uploadError.message);setLoading(false);return;}
     const image=await createImageBitmap(file).catch(()=>null);
+    const { data: previousSlotRows } = slot && !isSiteIdentity
+      ? await supabase.from('media_assets').select('id,path').eq('bucket', bucket).eq('slot', slot)
+      : { data: [] as { id: string; path: string }[] };
+
     const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||(isLogo?'Logo Kari Do Canto — Artesanato com Afeto':'Imagem de preview social — Kari Do Canto'),slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
     image?.close();
-    if(insertError){if(!isSiteIdentity)await supabase.storage.from(bucket).remove([path]);setError(insertError.message);}else{if(isSiteIdentity)await supabase.from('media_assets').delete().eq('bucket','site').eq('path',path);setMessage(isLogo?'Logo atualizado. O site passa a usar este arquivo automaticamente.':isOgImage?'Imagem de preview social atualizada. O novo preview será usado automaticamente.':'Imagem adicionada com sucesso.');setFile(null);setAlt('');setSlot('');await loadAssets();}
+
+    if(insertError){
+      if(!isSiteIdentity)await supabase.storage.from(bucket).remove([path]);
+      setError(insertError.message);
+    }else{
+      // A named slot is a single active location. Remove older rows for the
+      // same slot so the panel and the public site cannot disagree.
+      if (previousSlotRows?.length) {
+        await supabase.from('media_assets').delete().in('id', previousSlotRows.map(row => row.id));
+        await supabase.storage.from(bucket).remove(previousSlotRows.map(row => row.path));
+      }
+      if(isSiteIdentity)await supabase.from('media_assets').delete().eq('bucket','site').eq('path',path);
+      setMessage(
+        isLogo
+          ? 'Logo atualizado. O site passa a usar este arquivo automaticamente.'
+          : isOgImage
+            ? 'Imagem de preview social atualizada. O novo preview será usado automaticamente.'
+            : slot
+              ? `Imagem de "${slot}" atualizada. A Home usará esta imagem automaticamente.`
+              : 'Imagem adicionada com sucesso.'
+      );
+      setFile(null);setAlt('');setSlot('');await loadAssets();
+    }
     setLoading(false);
   }
   async function remove(asset:MediaAsset){if(!supabase||!window.confirm(`Excluir ${asset.filename}?`))return;setLoading(true);setError('');const {error:storageError}=await supabase.storage.from(asset.bucket).remove([asset.path]);if(storageError){setError(storageError.message);setLoading(false);return;}const {error:dbError}=await supabase.from('media_assets').delete().eq('id',asset.id);if(dbError)setError(dbError.message);else setAssets(current=>current.filter(item=>item.id!==asset.id));setLoading(false);}
@@ -59,6 +85,7 @@ export default function AdminMediaManager() {
     <form className="media-upload" onSubmit={upload}>
       <label>Local<select value={bucket} onChange={e=>{setBucket(e.target.value);if(e.target.value!=='site')setSlot('');}}>{BUCKETS.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
       <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="site-og-image">PREVIEW SOCIAL / OPEN GRAPH</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="home-about">Home — Sobre a Kari</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
+      {bucket === 'site' && <p className="form-status" style={{ marginTop: -8 }}>Para trocar uma imagem da Home, escolha a posição correspondente. “Imagem comum” não altera nenhuma imagem fixa da Home.</p>}
       <label className="media-file">Imagem<input type="file" accept="image/svg+xml,image/jpeg,image/png,image/webp,image/avif" onChange={onFileChange} required/></label>
       <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'Kari Do Canto — Artesanato com Afeto':slot==='site-og-image'?'Preview social — Kari Do Canto':'Descrição da imagem'}/></label>
       <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO LOGO…':slot==='site-og-image'?'ATUALIZANDO PREVIEW…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':slot==='site-og-image'?'ATUALIZAR PREVIEW':'ADICIONAR IMAGEM')}</button>

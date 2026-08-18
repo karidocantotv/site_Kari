@@ -18,12 +18,25 @@ export async function getPublicSiteMedia(slots: string[]) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return {};
   const supabase = createClient(url, key);
-  const { data } = await supabase.from('media_assets').select('slot,path,alt_text,filename').eq('bucket', 'site').in('slot', slots);
-  return Object.fromEntries((data ?? []).map((row) => [row.slot, {
-    url: supabase.storage.from('site').getPublicUrl(row.path).data.publicUrl,
-    alt: row.alt_text ?? '',
-    filename: row.filename ?? '',
-  }]));
+  const { data } = await supabase
+    .from('media_assets')
+    .select('slot,path,alt_text,filename,created_at')
+    .eq('bucket', 'site')
+    .in('slot', slots)
+    .order('created_at', { ascending: true });
+
+  // A slot represents the active image for that location. If old uploads
+  // remain in the library, the newest one must win deterministically.
+  const result: Record<string, { url: string; alt: string; filename: string }> = {};
+  for (const row of data ?? []) {
+    if (!row.slot) continue;
+    result[row.slot] = {
+      url: supabase.storage.from('site').getPublicUrl(row.path).data.publicUrl,
+      alt: row.alt_text ?? '',
+      filename: row.filename ?? '',
+    };
+  }
+  return result;
 }
 
 export async function getPublicBlogMedia(slug: string) {
