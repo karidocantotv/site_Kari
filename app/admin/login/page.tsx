@@ -42,7 +42,7 @@ export default function AdminLogin() {
       <div className="container">
         <div className="adminbox admin-login-box">
           <span className="eyebrow">Painel Vital</span>
-          <h1 className="serif">KARI Do Canto</h1>
+          <h1 className="serif">Kari Do Canto</h1>
           <p>Entre para gerenciar imagens e conteúdo do site.</p>
           <form onSubmit={handleSubmit} className="admin-login-form">
             <label>E-mail<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></label>

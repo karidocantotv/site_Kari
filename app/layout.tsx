@@ -6,6 +6,7 @@ import NewsletterForm from '@/components/NewsletterForm';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 import LogoImage from '@/components/LogoImage';
 import PWARegister from '@/components/PWARegister';
+import { SITE_VERSION } from '@/lib/site-version';
 
 const buildVersion = process.env.CF_PAGES_COMMIT_SHA || process.env.NEXT_PUBLIC_BUILD_VERSION || 'dev';
 const buildShort = buildVersion === 'dev' ? 'dev' : buildVersion.slice(0, 7);
@@ -36,7 +37,7 @@ function Header() {
       <div className="container nav-inner">
         <a href="/" className="logo logo-mark" aria-label="Kari Do Canto — início"><LogoImage /></a>
         <nav className="links" aria-label="Navegação principal">
-          <a href="/">INÍCIO</a><a href="/sobre">SOBRE KARI</a><a href="/cursos">CURSOS</a><a href="/projetos">PROJETOS</a><a href="/blog">BLOG</a><a href="/contato">CONTATO</a>
+          <a href="/">INÍCIO</a><a href="/sobre">SOBRE Kari</a><a href="/cursos">CURSOS</a><a href="/projetos">PROJETOS</a><a href="/blog">BLOG</a><a href="/contato">CONTATO</a>
           <a className="btn primary" href="/cursos">ÁREA DO ALUNO</a>
         </nav>
         <a className="mobile-menu" href="/cursos" aria-label="Abrir área de cursos">☰</a>
@@ -53,7 +54,7 @@ function Footer() {
       <div><h4>Navegação</h4><p><a href="/sobre">Sobre Kari</a><br/><a href="/cursos">Cursos</a><br/><a href="/projetos">Projetos</a><br/><a href="/blog">Blog</a></p></div>
       <div><h4>Ajuda</h4><p><a href="/contato">Contato</a><br/><a href="/politica-de-privacidade">Política de privacidade</a><br/><a href="/termos-de-uso">Termos de uso</a></p></div>
       <div><h4>Siga nas redes</h4><p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p></div>
-    </div><div className="container footer-bottom"><span>© 2026 Kari Do Canto. Todos os direitos reservados.</span><span>Build {buildShort}</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
+    </div><div className="container footer-bottom"><span>© 2026 Kari Do Canto. Todos os direitos reservados.</span><span>{SITE_VERSION} · Build {buildShort}</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
   </>;
 }
 

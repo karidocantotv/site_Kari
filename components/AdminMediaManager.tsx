@@ -41,7 +41,7 @@ export default function AdminMediaManager() {
     const {error:uploadError}=await supabase.storage.from(bucket).upload(path,file,{upsert:isLogo,contentType:file.type,cacheControl:isLogo?'0':'31536000'});
     if(uploadError){setError(uploadError.message);setLoading(false);return;}
     const image=await createImageBitmap(file).catch(()=>null);
-    const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||'Logo KARI Do Canto — Artesanato com Afeto',slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
+    const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||'Logo Kari Do Canto — Artesanato com Afeto',slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
     image?.close();
     if(insertError){if(!isLogo)await supabase.storage.from(bucket).remove([path]);setError(insertError.message);}else{setMessage(isLogo?'Logo atualizado. O site passa a usar este arquivo automaticamente.':'Imagem adicionada com sucesso.');setFile(null);setAlt('');setSlot('');await loadAssets();}
     setLoading(false);
@@ -58,7 +58,7 @@ export default function AdminMediaManager() {
       <label>Local<select value={bucket} onChange={e=>{setBucket(e.target.value);if(e.target.value!=='site')setSlot('');}}>{BUCKETS.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
       <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
       <label className="media-file">Imagem<input type="file" accept="image/svg+xml,image/jpeg,image/png,image/webp,image/avif" onChange={onFileChange} required/></label>
-      <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'KARI Do Canto — Artesanato com Afeto':'Descrição da imagem'}/></label>
+      <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'Kari Do Canto — Artesanato com Afeto':'Descrição da imagem'}/></label>
       <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':'ADICIONAR IMAGEM')}</button>
       {message&&<p className="form-status success">{message}</p>}{error&&<p className="form-status error">{error}</p>}
     </form>

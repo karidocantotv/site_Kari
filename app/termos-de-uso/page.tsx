@@ -1,10 +1,16 @@
+import Link from 'next/link';
+
 export const metadata = {
   title: 'Termos de Uso',
   description: 'Termos de uso do site Kari Do Canto — Artesanato com Afeto.',
 };
 
+const styles = `
+.legal{padding:72px 0 96px}.legal-wrap{max-width:900px;margin:0 auto}.legal h1{font-size:clamp(42px,6vw,68px);line-height:1.05;margin:12px 0 18px}.legal h2{font-size:28px;margin:42px 0 12px}.legal p,.legal li{font-size:16px;line-height:1.8;color:#5f5955}.legal ul{padding-left:24px}.legal .updated{font-size:13px;color:#8b817b}.legal a{color:inherit;text-decoration:underline}
+`;
+
 export default function TermosDeUso() {
-  return <main className="legal"><div className="container legal-wrap">
+  return <main className="legal"><style>{styles}</style><div className="container legal-wrap">
     <span className="eyebrow">Informações legais</span>
     <h1 className="serif">Termos de Uso</h1>
     <p className="updated">Última atualização: 18 de agosto de 2026.</p>
@@ -32,7 +38,7 @@ export default function TermosDeUso() {
     <p>O usuário deve utilizar o site de forma lícita, respeitosa e compatível com estes termos. É proibido tentar obter acesso não autorizado, interferir no funcionamento do site, introduzir código malicioso ou utilizar os recursos para finalidade ilícita.</p>
 
     <h2 className="serif">7. Privacidade</h2>
-    <p>O tratamento de dados pessoais realizado por meio do site é explicado na <a href="/politica-de-privacidade">Política de Privacidade</a>, que integra estes Termos de Uso.</p>
+    <p>O tratamento de dados pessoais realizado por meio do site é explicado na <Link href="/politica-de-privacidade">Política de Privacidade</Link>, que integra estes Termos de Uso.</p>
 
     <h2 className="serif">8. Alterações destes termos</h2>
     <p>Estes termos podem ser atualizados para refletir mudanças no site, nos serviços oferecidos ou na legislação. A versão publicada nesta página será considerada a versão vigente.</p>
@@ -41,6 +47,6 @@ export default function TermosDeUso() {
     <p>Estes termos são interpretados de acordo com a legislação brasileira, observados os direitos assegurados ao consumidor e demais normas aplicáveis.</p>
 
     <h2 className="serif">10. Contato</h2>
-    <p>Para dúvidas, solicitações ou informações relacionadas a estes termos, utilize o <a href="/contato">canal de contato</a> disponibilizado no site.</p>
+    <p>Para dúvidas, solicitações ou informações relacionadas a estes termos, utilize o <Link href="/contato">canal de contato</Link> disponibilizado no site.</p>
   </div></main>;
 }

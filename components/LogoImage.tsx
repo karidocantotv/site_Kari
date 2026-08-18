@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const FALLBACK = '/brand/kari-do-canto.svg';
 
-export default function LogoImage({ className = '', alt = 'KARI Do Canto — Artesanato com Afeto' }: { className?: string; alt?: string }) {
+export default function LogoImage({ className = '', alt = 'Kari Do Canto — Artesanato com Afeto' }: { className?: string; alt?: string }) {
   const [src, setSrc] = useState(FALLBACK);
 
   useEffect(() => {

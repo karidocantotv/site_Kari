@@ -1,7 +1,8 @@
 import AdminMediaManager from '@/components/AdminMediaManager';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
+import { SITE_VERSION } from '@/lib/site-version';
 
-export const metadata = { title: 'Painel Vital — KARI Do Canto' };
+export const metadata = { title: 'Painel Vital — Kari Do Canto' };
 
 export default function Dashboard() {
   const analyticsConfigured = Boolean(process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN);
@@ -14,10 +15,10 @@ export default function Dashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <div>
             <span className="eyebrow">Painel Vital</span>
-            <h1 className="serif">KARI Do Canto</h1>
+            <h1 className="serif">Kari Do Canto</h1>
             <p>Central administrativa para conteúdo, imagens, leads, cursos e métricas do site.</p>
           </div>
-          <div className="analytics-status is-on" title={`Build completo: ${buildVersion}`}><span className="analytics-dot" /> Build {buildShort}</div>
+          <div className="analytics-status is-on" title={`Build completo: ${buildVersion}`}><span className="analytics-dot" /> {SITE_VERSION} · Build {buildShort}</div>
         </div>
         <AdminMediaManager />
         <div className="grid4" style={{ marginTop: 24 }}>
@@ -31,7 +32,7 @@ export default function Dashboard() {
           <div className="analytics-grid"><div className="analytics-card"><span>Web Analytics</span><strong>{analyticsConfigured ? 'Ativo' : 'Não configurado'}</strong><small>Beacon RUM instalado no site.</small></div><div className="analytics-card"><span>Core Web Vitals</span><strong>Monitorados</strong><small>LCP, INP, CLS, TTFB e FCP.</small></div><div className="analytics-card"><span>Relatórios</span><strong>Cloudflare</strong><small>Os dados e gráficos completos ficam no painel do Cloudflare.</small></div></div>
           <a className="btn primary analytics-link" href="https://dash.cloudflare.com/?to=/:account/analytics/web-analytics" target="_blank" rel="noreferrer">ABRIR WEB ANALYTICS ↗</a>
         </section>
-        <p style={{ marginTop: 28, fontSize: 11 }}>Build completo: {buildVersion} · Criado por Agência Rio de la Plata.</p>
+        <p style={{ marginTop: 28, fontSize: 11 }}>{SITE_VERSION} · Build completo: {buildVersion} · Criado por Agência Rio de la Plata.</p>
       </div>
     </div>
   </main></AdminAuthGuard>;
