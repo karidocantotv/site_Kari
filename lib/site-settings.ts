@@ -18,7 +18,7 @@ export async function getPublicBlogMedia(slug: string) {
   if (!url || !key) return {};
   const supabase = createClient(url, key);
   const slots = [`blog:${slug}:cover`, `blog:${slug}:inside`, `blog:${slug}:download`];
-  const { data } = await supabase.from('media_assets').select('slot,path,alt_text').eq('bucket', 'blog').in('slot', slots);
+  const { data } = await supabase.from('media_assets').select('slot,path,alt_text,filename').eq('bucket', 'blog').in('slot', slots);
   return Object.fromEntries((data ?? []).map((row) => [row.slot, {
     url: supabase.storage.from('blog').getPublicUrl(row.path).data.publicUrl,
     alt: row.alt_text ?? '',
@@ -33,7 +33,7 @@ export async function getPublicBlogCovers(slugs: string[]) {
   if (!url || !key) return {};
   const supabase = createClient(url, key);
   const slots = slugs.map((slug) => `blog:${slug}:cover`);
-  const { data } = await supabase.from('media_assets').select('slot,path,alt_text').eq('bucket', 'blog').in('slot', slots);
+  const { data } = await supabase.from('media_assets').select('slot,path,alt_text,filename').eq('bucket', 'blog').in('slot', slots);
   return Object.fromEntries((data ?? []).map((row) => [row.slot, {
     url: supabase.storage.from('blog').getPublicUrl(row.path).data.publicUrl,
     alt: row.alt_text ?? '',

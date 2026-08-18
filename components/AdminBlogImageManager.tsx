@@ -19,7 +19,7 @@ function publicUrl(supabase: ReturnType<typeof getSupabaseBrowserClient>, path: 
 
 export default function AdminBlogImageManager() {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-  const [post, setPost] = useState(POSTS[0][0]);
+  const [post, setPost] = useState<(typeof POSTS)[number][0]>(POSTS[0][0]);
   const [cover, setCover] = useState<File | null>(null);
   const [inside, setInside] = useState<File | null>(null);
   const [downloadZip, setDownloadZip] = useState<File | null>(null);
@@ -102,7 +102,7 @@ export default function AdminBlogImageManager() {
   return <section className="media-panel">
     <div className="media-head"><div><span className="eyebrow">Conteúdo do Blog</span><h2 className="serif">Imagens dos artigos</h2><p>Cada artigo pode ter até 2 imagens: uma capa e uma imagem interna. A capa também é usada no compartilhamento social quando configurada.</p></div></div>
     <form className="settings-form" onSubmit={save}>
-      <label>Artigo<select value={post} onChange={e => setPost(e.target.value)}>{POSTS.map(([slug, title]) => <option key={slug} value={slug}>{title}</option>)}</select></label>
+      <label>Artigo<select value={post} onChange={e => setPost(e.target.value as (typeof POSTS)[number][0])}>{POSTS.map(([slug, title]) => <option key={slug} value={slug}>{title}</option>)}</select></label>
       <div className="blog-image-settings-grid">
         <div className="blog-image-setting">
           <span className="eyebrow">Imagem 1</span><h3 className="serif">Capa do artigo</h3>
