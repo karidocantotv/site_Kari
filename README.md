@@ -60,3 +60,25 @@ Execute `supabase/media_migration.sql` uma vez no Supabase. Depois crie um usuá
 ### Supabase
 
 Execute uma vez o arquivo `supabase/site_settings_migration.sql` no SQL Editor do projeto Supabase antes de usar as novas configurações do Painel Vital.
+
+## V1.6.8 — Conteúdo dinâmico do Painel Vital
+
+Esta versão transforma Blog e Cursos em módulos de conteúdo gerenciáveis pelo Painel Vital.
+
+### Migração Supabase obrigatória
+
+Execute uma vez o arquivo:
+
+`supabase/content_migration.sql`
+
+Ele cria `content_items`, aplica RLS e migra os quatro artigos e quatro cursos existentes para a nova estrutura.
+
+### Comportamento
+
+- Blog: criar, editar, ordenar, publicar/despublicar, alterar slug, resumo, conteúdo, categoria, duas imagens e molde ZIP.
+- Cursos: criar, editar, ordenar, publicar/despublicar, alterar slug, resumo, conteúdo, categoria e imagem de capa.
+- Home: carrega automaticamente os conteúdos publicados.
+- Se houver menos de quatro conteúdos na Home, os espaços restantes exibem “Em breve”.
+- Se houver cinco ou mais conteúdos, a Home mostra os quatro primeiros por ordem; as páginas `/blog` e `/cursos` mostram todos os publicados.
+- Novos artigos/cursos publicados passam a gerar suas próprias URLs e entram no sitemap automaticamente.
+- O conteúdo antigo permanece como fallback somente se o Supabase estiver indisponível durante a renderização.

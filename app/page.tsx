@@ -2,6 +2,7 @@ import Link from 'next/link';
 import YouTubeGallery from '@/components/YouTubeGallery';
 import InstagramProfile from '@/components/InstagramProfile';
 import { getPublicSiteMedia, getPublicSiteSettings } from '@/lib/site-settings';
+import { getPublicContent, getPublicContentCovers } from '@/lib/content';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -13,21 +14,14 @@ export const metadata: Metadata = {
 };
 import SeoJsonLd from '@/components/SeoJsonLd';
 
-const courses = [
-  ['course-feltro.webp','FELTRO','Feltro: Criações com Amor','Projetos delicados, técnicas essenciais e acabamentos para criar com carinho.','/cursos/feltro-criacoes-com-amor'],
-  ['course-patchwork.webp','PATCHWORK','Patchwork: Do básico ao acabamento','Aprenda fundamentos e detalhes para transformar tecidos em peças para a casa.','/cursos/patchwork-do-basico'],
-  ['course-madeira.webp','ARTE EM MADEIRA','Arte em Madeira: Decore e transforme','Pintura, texturas e acabamentos para criar peças com personalidade.','/cursos/arte-em-madeira'],
-  ['course-scrapbook.webp','SCRAPBOOK','Scrapbook: Memórias que ficam','Papéis, composição e detalhes para transformar histórias em projetos afetivos.','/cursos/scrapbook-memorias'],
-];
-const posts = [
-  ['blog-cestinho.webp','PASSO A PASSO','Cestinho de tecido: passo a passo completo','Do material ao acabamento, uma peça bonita para organizar e decorar a casa.','/blog/cestinho-de-tecido'],
-  ['blog-linhas.webp','DICAS','Como escolher as melhores linhas','Um guia para escolher materiais e deixar cada projeto ainda mais especial.','/blog/como-escolher-linhas'],
-  ['blog-madeira.webp','TÉCNICAS','Pintura em madeira: técnicas e cuidados','Preparação, pintura e proteção para peças feitas para durar.','/blog/pintura-em-madeira'],
-  ['blog-feltro.webp','INSPIRAÇÃO','Flores de feltro: ideias para criar','Detalhes feitos à mão para presentear, decorar e transformar ambientes.','/blog/flores-de-feltro'],
-];
+function fillWithComingSoon<T>(items: T[], size = 4) {
+  return [...items.slice(0, size), ...Array.from({ length: Math.max(0, size - items.length) }, (_, i) => ({ __comingSoon: true, id: `coming-${i}` } as T))];
+}
+
 
 export default async function Home() {
-  const settings = await getPublicSiteSettings([
+  const [settings, blogItems, courseItems] = await Promise.all([
+    getPublicSiteSettings([
     'cursos_title', 'cursos_description', 'cursos_enabled',
     'blog_title', 'blog_description', 'blog_enabled',
     'projetos_title', 'projetos_description', 'projetos_enabled',
@@ -36,6 +30,13 @@ export default async function Home() {
     'youtube_video_id_3', 'youtube_video_title_3', 'youtube_video_enabled_3',
     'youtube_video_id_4', 'youtube_video_title_4', 'youtube_video_enabled_4',
     'youtube_video_id_5', 'youtube_video_title_5', 'youtube_video_enabled_5',
+  ]),
+    getPublicContent('blog'),
+    getPublicContent('curso'),
+  ]);
+  const [blogMedia, courseMedia] = await Promise.all([
+    getPublicContentCovers('blog', blogItems.map((item) => item.slug)),
+    getPublicContentCovers('curso', courseItems.map((item) => item.slug)),
   ]);
   const siteMedia = await getPublicSiteMedia(['home-hero', 'home-about']);
   const heroImage = siteMedia['home-hero']?.url || '/images/hero.webp';
@@ -71,11 +72,11 @@ export default async function Home() {
       <div className="trust-item"><div className="trust-icon">✦</div><div><b>Experiência da Kari</b><span>Uma trajetória na televisão transformada em inspiração para criar com as próprias mãos.</span></div></div>
     </div></section>
 
-    <section className="section" hidden={!cursosEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Aprenda no seu tempo</span><h2 className="serif">{settings.cursos_title || 'Cursos para criar com afeto'}</h2><p>{settings.cursos_description || 'Escolha uma técnica, acompanhe o passo a passo e transforme uma ideia em uma peça que tenha a sua cara.'}</p></div><div className="grid4">{courses.map(c=><article className="card" key={c[2]}><img src={'/images/'+c[0]} alt={c[2]} loading="lazy" decoding="async" width="200" height="157"/><div className="card-body"><span className="tag">{c[1]}</span><h3>{c[2]}</h3><p>{c[3]}</p><Link className="more" href={c[4]}>CONHECER CURSO →</Link></div></article>)}</div><div className="center"><Link className="btn primary" href="/cursos">VER TODOS OS CURSOS</Link></div></div></section>
+    <section className="section" hidden={!cursosEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Aprenda no seu tempo</span><h2 className="serif">{settings.cursos_title || 'Cursos para criar com afeto'}</h2><p>{settings.cursos_description || 'Escolha uma técnica, acompanhe o passo a passo e transforme uma ideia em uma peça que tenha a sua cara.'}</p></div><div className="grid4">{fillWithComingSoon(courseItems).map((c:any)=><article className={c.__comingSoon ? 'card coming-soon-card' : 'card'} key={c.id}>{c.__comingSoon ? <div className="coming-soon"><span className="tag">Em breve</span><h3 className="serif">Novo curso chegando</h3><p>Em breve teremos uma nova experiência para você aprender e criar com afeto.</p></div> : <><img src={courseMedia[`course:${c.slug}:cover`]?.url || '/images/course-feltro.webp'} alt={courseMedia[`course:${c.slug}:cover`]?.alt || c.title} loading="lazy" decoding="async" width="200" height="157"/><div className="card-body"><span className="tag">{c.category || 'Curso online'}</span><h3>{c.title}</h3><p>{c.summary}</p><Link className="more" href={'/cursos/'+c.slug}>CONHECER CURSO →</Link></div></>}</article>)}</div><div className="center"><Link className="btn primary" href="/cursos">VER TODOS OS CURSOS</Link></div></div></section>
 
     <section className="section video-section"><div className="container"><div className="section-head"><span className="eyebrow">Vídeos da Kari</span><h2 className="serif">Aprenda, assista e crie.</h2><p>Conteúdo do YouTube em uma galeria leve: o player só é carregado quando você decide assistir.</p></div><YouTubeGallery videos={youtubeVideos} channel={youtubeChannel} /></div></section>
 
-    <section className="section alt" hidden={!blogEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Conteúdo gratuito</span><h2 className="serif">{settings.blog_title || 'Dicas e passo a passo para a casa'}</h2><p>{settings.blog_description || 'Aprenda uma técnica, escolha seus materiais e encontre inspiração para o próximo projeto.'}</p></div><div className="grid4">{posts.map(p=><article className="card" key={p[2]}><img src={'/images/'+p[0]} alt={p[2]} loading="lazy" decoding="async" width="200" height="118"/><div className="card-body"><span className="tag">{p[1]}</span><h3>{p[2]}</h3><p>{p[3]}</p><Link className="more" href={p[4]}>LER ARTIGO →</Link></div></article>)}</div><div className="center"><Link className="btn" href="/blog">VER TODOS OS ARTIGOS</Link></div></div></section>
+    <section className="section alt" hidden={!blogEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Conteúdo gratuito</span><h2 className="serif">{settings.blog_title || 'Dicas e passo a passo para a casa'}</h2><p>{settings.blog_description || 'Aprenda uma técnica, escolha seus materiais e encontre inspiração para o próximo projeto.'}</p></div><div className="grid4">{fillWithComingSoon(blogItems).map((p:any)=><article className={p.__comingSoon ? 'card coming-soon-card' : 'card'} key={p.id}>{p.__comingSoon ? <div className="coming-soon"><span className="tag">Em breve</span><h3 className="serif">Novo conteúdo chegando</h3><p>Em breve teremos um novo artigo com dicas, técnicas e inspiração para você.</p></div> : <><img src={blogMedia[`blog:${p.slug}:cover`]?.url || '/images/blog-cestinho.webp'} alt={blogMedia[`blog:${p.slug}:cover`]?.alt || p.title} loading="lazy" decoding="async" width="200" height="118"/><div className="card-body"><span className="tag">{p.category}</span><h3>{p.title}</h3><p>{p.summary}</p><Link className="more" href={'/blog/'+p.slug}>LER ARTIGO →</Link></div></>}</article>)}</div><div className="center"><Link className="btn" href="/blog">VER TODOS OS ARTIGOS</Link></div></div></section>
 
     <section className="section social-section"><div className="container social-grid"><div><div className="section-head social-head"><span className="eyebrow">Siga a Kari</span><h2 className="serif">Mais ideias para criar com afeto.</h2><p>Continue acompanhando a Kari nas redes e descubra novos projetos, dicas e inspirações para a sua casa.</p></div><div className="social-links"><a className="btn primary" href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YOUTUBE ↗</a><a className="btn" href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">INSTAGRAM ↗</a></div></div><InstagramProfile /></div></section>
 
