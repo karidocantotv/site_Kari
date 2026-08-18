@@ -5,6 +5,10 @@ import type { Metadata } from 'next';
 import NewsletterForm from '@/components/NewsletterForm';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 import LogoImage from '@/components/LogoImage';
+import PWARegister from '@/components/PWARegister';
+
+const buildVersion = process.env.CF_PAGES_COMMIT_SHA || process.env.NEXT_PUBLIC_BUILD_VERSION || 'dev';
+const buildShort = buildVersion === 'dev' ? 'dev' : buildVersion.slice(0, 7);
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://karidocanto.com.br'),
@@ -19,6 +23,10 @@ export const metadata: Metadata = {
     type: 'website',
   },
   icons: { icon: '/icon.svg', apple: '/apple-icon.svg' },
+  applicationName: 'KARI Do Canto',
+  manifest: '/manifest.webmanifest',
+  themeColor: '#879681',
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'KARI Do Canto' },
 };
 
 function Header() {
@@ -45,10 +53,10 @@ function Footer() {
       <div><h4>Navegação</h4><p><Link href="/sobre">Sobre Kari</Link><br/><Link href="/cursos">Cursos</Link><br/><Link href="/projetos">Projetos</Link><br/><Link href="/blog">Blog</Link></p></div>
       <div><h4>Ajuda</h4><p><Link href="/contato">Contato</Link><br/><Link href="/politica-de-privacidade">Política de privacidade</Link><br/><Link href="/termos-de-uso">Termos de uso</Link></p></div>
       <div><h4>Siga nas redes</h4><p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p></div>
-    </div><div className="container footer-bottom"><span>© 2026 KARI Do Canto. Todos os direitos reservados.</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
+    </div><div className="container footer-bottom"><span>© 2026 KARI Do Canto. Todos os direitos reservados.</span><span>Build {buildShort}</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
   </>;
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <><Header/>{children}<Footer/><CloudflareAnalytics/></>;
+  return <><Header/>{children}<Footer/><CloudflareAnalytics/><PWARegister/></>;
 }
