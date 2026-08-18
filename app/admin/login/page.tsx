@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import AdminBrand from '@/components/AdminBrand';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -41,7 +42,7 @@ export default function AdminLogin() {
     <main className="admin">
       <div className="container">
         <div className="adminbox admin-login-box">
-          <span className="eyebrow">Painel Vital</span>
+          <AdminBrand />
           <h1 className="serif">Kari Do Canto</h1>
           <p>Entre para gerenciar imagens e conteúdo do site.</p>
           <form onSubmit={handleSubmit} className="admin-login-form">

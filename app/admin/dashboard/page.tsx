@@ -1,6 +1,7 @@
 import AdminMediaManager from '@/components/AdminMediaManager';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 import { SITE_VERSION } from '@/lib/site-version';
+import AdminBrand from '@/components/AdminBrand';
 
 export const metadata = { title: 'Painel Vital — Kari Do Canto' };
 
@@ -14,7 +15,7 @@ export default function Dashboard() {
       <div className="adminbox">
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <div>
-            <span className="eyebrow">Painel Vital</span>
+            <AdminBrand />
             <h1 className="serif">Kari Do Canto</h1>
             <p>Central administrativa para conteúdo, imagens, leads, cursos e métricas do site.</p>
           </div>

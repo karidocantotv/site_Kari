@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Kari Do Canto — Artesanato com Afeto',
-    short_name: 'Kari Do Canto',
-    description: 'Cursos, projetos, dicas e passo a passo de artesanato com afeto.',
-    start_url: '/',
+    name: 'Painel Vital - Kari',
+    short_name: 'Painel Vital - Kari',
+    description: 'Painel administrativo do site Kari Do Canto.',
+    start_url: '/admin/dashboard',
     display: 'standalone',
     background_color: '#f8f4ec',
     theme_color: '#879681',
