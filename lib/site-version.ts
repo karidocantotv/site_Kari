@@ -1,1 +1,1 @@
-export const SITE_VERSION = 'V2.0.0-BILINGUE';
+export const SITE_VERSION = '2.0.1';

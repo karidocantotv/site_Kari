@@ -18,6 +18,9 @@ export default function MobileMenu() {
   const es = pathname === '/es' || pathname.startsWith('/es/');
   const path = (href:string) => es ? `/es${href === '/' ? '' : href}` : href;
   const labels = es ? ['INICIO','SOBRE KARI','CURSOS','PROYECTOS','BLOG','CONTACTO'] : ['INÍCIO','SOBRE Kari','CURSOS','PROJETOS','BLOG','CONTATO'];
+  const rememberLocale = (locale: 'pt-BR' | 'es-LA') => {
+    document.cookie = `kari_locale=${locale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +55,7 @@ export default function MobileMenu() {
         {links.map(([, href], i) => (
           <a key={href} href={path(href)} onClick={() => setOpen(false)}>{labels[i]}</a>
         ))}
-        <div className="mobile-language"><a href={es ? (pathname.replace(/^\/es/, '') || '/') : pathname}>🇧🇷 PT</a><span>|</span><a href={es ? pathname : `/es${pathname === '/' ? '' : pathname}`}>🌎 ES</a></div>
+        <div className="mobile-language"><a href={es ? (pathname.replace(/^\/es/, '') || '/') : pathname} onClick={() => rememberLocale('pt-BR')}>🇧🇷 PT</a><span>|</span><a href={es ? pathname : `/es${pathname === '/' ? '' : pathname}`} onClick={() => rememberLocale('es-LA')}>🌎 ES</a></div>
         <a className="btn primary" href={path('/cursos')} onClick={() => setOpen(false)}>{es ? 'ÁREA DEL ALUMNO' : 'ÁREA DO ALUNO'}</a>
       </nav>
     </div>

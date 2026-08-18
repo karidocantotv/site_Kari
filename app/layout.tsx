@@ -1,6 +1,6 @@
 import './globals.css';
 import './logo.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import NewsletterForm from '@/components/NewsletterForm';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 import LogoImage from '@/components/LogoImage';
@@ -12,6 +12,8 @@ import { SITE_VERSION } from '@/lib/site-version';
 
 const buildVersion = process.env.CF_PAGES_COMMIT_SHA || process.env.NEXT_PUBLIC_BUILD_VERSION || 'dev';
 const buildShort = buildVersion === 'dev' ? 'dev' : buildVersion.slice(0, 7);
+
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://karidocanto.com.br'),
