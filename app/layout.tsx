@@ -8,6 +8,8 @@ import LanguageAwareLogo from '@/components/LanguageAwareLogo';
 import MobileMenu from '@/components/MobileMenu';
 import LanguageAwareNav from '@/components/LanguageAwareNav';
 import LanguageAwareFooterLinks from '@/components/LanguageAwareFooterLinks';
+import LanguageAwareTopbar from '@/components/LanguageAwareTopbar';
+import LanguageDocumentLang from '@/components/LanguageDocumentLang';
 import { SITE_VERSION } from '@/lib/site-version';
 
 const buildVersion = process.env.CF_PAGES_COMMIT_SHA || process.env.NEXT_PUBLIC_BUILD_VERSION || 'dev';
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
 
 function Header() {
   return <>
-    <div className="topbar"><div className="container topbar-inner"><span>✦ Cursos e projetos de artesanato com quem ensinou na televisão</span><span className="top-social">Instagram · YouTube · Facebook</span></div></div>
+    <LanguageAwareTopbar />
     <header className="nav">
       <div className="container nav-inner">
         <LanguageAwareLogo />
@@ -70,5 +72,5 @@ function Footer() {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pt-BR"><body><Header/>{children}<Footer/><CloudflareAnalytics/></body></html>;
+  return <html lang="pt-BR"><body><LanguageDocumentLang/><Header/>{children}<Footer/><CloudflareAnalytics/></body></html>;
 }
