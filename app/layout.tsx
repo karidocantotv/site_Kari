@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://karidocanto.com.br'),
   title: { default: 'Kari Do Canto | Artesanato com Afeto', template: '%s | Kari Do Canto' },
   description: 'Artesanato com afeto: cursos, projetos, dicas e passo a passo para criar peças para a casa.',
-  alternates: { canonical: 'https://karidocanto.com.br' },
   openGraph: {
     title: 'Kari Do Canto | Artesanato com Afeto',
     description: 'Ideias, cursos e passo a passo para criar para a casa com amor e afeto.',
@@ -37,7 +36,7 @@ export const metadata: Metadata = {
   },
   icons: { icon: '/icon.svg', apple: '/apple-icon.svg' },
   applicationName: 'Kari Do Canto',
-  manifest: '/manifest.webmanifest?v=1.6.1',
+  manifest: '/manifest.webmanifest?v=1.6.3',
   themeColor: '#879681',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Kari Do Canto' },
 };

@@ -1,16 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import SeoJsonLd from '@/components/SeoJsonLd';
 
-export const metadata = {
-  title: 'Política de Privacidade',
-  description: 'Política de Privacidade da Kari Do Canto — Artesanato com Afeto.',
-};
+export const metadata: Metadata = { title: 'Política de Privacidade', description: 'Conheça como o site Kari Do Canto trata dados, formulários e informações de navegação.', alternates: { canonical: 'https://karidocanto.com.br/politica-de-privacidade' }, openGraph: { title: 'Política de Privacidade', description: 'Conheça como o site Kari Do Canto trata dados, formulários e informações de navegação.', url: 'https://karidocanto.com.br/politica-de-privacidade', type: 'website', images: [{ url: '/api/og-image', alt: 'Política de Privacidade' }] }, twitter: { card: 'summary_large_image', title: 'Política de Privacidade', description: 'Conheça como o site Kari Do Canto trata dados, formulários e informações de navegação.', images: ['/api/og-image'] } };
 
 const styles = `
 .legal{padding:72px 0 96px}.legal-wrap{max-width:900px;margin:0 auto}.legal h1{font-size:clamp(42px,6vw,68px);line-height:1.05;margin:12px 0 18px}.legal h2{font-size:28px;margin:42px 0 12px}.legal p,.legal li{font-size:16px;line-height:1.8;color:#5f5955}.legal ul{padding-left:24px}.legal .updated{font-size:13px;color:#8b817b}.legal a{color:inherit;text-decoration:underline}
 `;
 
 export default function PoliticaDePrivacidade() {
-  return <main className="legal"><style>{styles}</style><div className="container legal-wrap">
+  return <>
+    <SeoJsonLd type="WebPage" name="Política de Privacidade" description="Conheça como o site Kari Do Canto trata dados, formulários e informações de navegação." url="/politica-de-privacidade" image="/api/og-image" breadcrumbs={[{name:'Início',item:'/'},{name:'Política de Privacidade',item:'/politica-de-privacidade'}]} />
+    <main className="legal"><style>{styles}</style><div className="container legal-wrap">
     <span className="eyebrow">Privacidade e transparência</span>
     <h1 className="serif">Política de Privacidade</h1>
     <p className="updated">Última atualização: 18 de agosto de 2026.</p>
@@ -73,5 +74,6 @@ export default function PoliticaDePrivacidade() {
 
     <h2 className="serif">14. Contato</h2>
     <p>Para dúvidas ou solicitações sobre privacidade e proteção de dados, utilize o <Link href="/contato">canal de contato</Link> disponibilizado no site.</p>
-  </div></main>;
+  </div></main>
+  </>;
 }

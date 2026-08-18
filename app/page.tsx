@@ -2,6 +2,16 @@ import Link from 'next/link';
 import YouTubeGallery from '@/components/YouTubeGallery';
 import InstagramProfile from '@/components/InstagramProfile';
 import { getPublicSiteSettings } from '@/lib/site-settings';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Kari Do Canto | Artesanato com Afeto',
+  description: 'Artesanato com afeto: cursos, projetos, dicas e passo a passo para criar peças para a casa.',
+  alternates: { canonical: 'https://karidocanto.com.br/' },
+  openGraph: { title: 'Kari Do Canto | Artesanato com Afeto', description: 'Ideias, cursos e passo a passo para criar para a casa com amor e afeto.', url: 'https://karidocanto.com.br/', type: 'website', images: [{ url: '/api/og-image', width: 1200, height: 630, alt: 'Kari Do Canto — Artesanato com Afeto' }] },
+  twitter: { card: 'summary_large_image', title: 'Kari Do Canto | Artesanato com Afeto', description: 'Ideias, cursos e passo a passo para criar para a casa com amor e afeto.', images: ['/api/og-image'] },
+};
+import SeoJsonLd from '@/components/SeoJsonLd';
 
 const courses = [
   ['course-feltro.jpg','FELTRO','Feltro: Criações com Amor','Projetos delicados, técnicas essenciais e acabamentos para criar com carinho.','/cursos/feltro-criacoes-com-amor'],
@@ -25,7 +35,9 @@ export default async function Home() {
   const cursosEnabled = settings.cursos_enabled !== 'false';
   const blogEnabled = settings.blog_enabled !== 'false';
   const projetosEnabled = settings.projetos_enabled !== 'false';
-  return <main>
+  return <>
+    <SeoJsonLd type="WebSite" name="Kari Do Canto | Artesanato com Afeto" description="Ideias, cursos e passo a passo para criar peças para a casa com amor e afeto." url="/" image="/api/og-image" />
+    <main>
     <section className="hero"><div className="container hero-grid"><div className="hero-copy"><span className="eyebrow">Artesanato · Casa · Afeto</span><h1>Crie para a sua casa <em>com amor e afeto.</em></h1><p>Ideias, cursos e passo a passo para transformar materiais simples em peças feitas pelas suas mãos — para decorar, organizar, presentear e deixar a casa ainda mais sua.</p><div className="actions"><Link className="btn primary" href="/cursos">CONHEÇA OS CURSOS</Link><Link className="btn" href="/sobre">CONHEÇA A Kari</Link></div></div><div className="hero-photo" aria-label="Mulher criando uma peça artesanal para a casa"/></div></section>
 
     <section className="trust"><div className="container trust-grid">
@@ -46,5 +58,6 @@ export default async function Home() {
     <section className="story"><div className="container story-grid"><div className="story-photo"/><div className="story-copy"><span className="eyebrow">Kari Do Canto</span><h2 className="serif">Uma casa bonita também conta histórias.</h2><p>Karina do Canto construiu uma trajetória como apresentadora e esteve à frente de conteúdos de artesanato como <strong>Armarinho da Arte</strong> e <strong>Rincón de Arte</strong>. Agora, essa experiência ganha um novo espaço para ensinar, inspirar e acompanhar você na criação de peças para a casa.</p><Link className="btn primary" href="/sobre">CONHEÇA A HISTÓRIA</Link></div></div></section>
 
     <section className="manifesto" hidden={!projetosEnabled}><div className="container"><span className="eyebrow">Artesanato com Afeto</span><h2 className="serif">{settings.projetos_title || 'Projetos para criar com afeto'}</h2><p>{settings.projetos_description || 'Passo a passo, ideias e galerias para você transformar materiais em peças feitas à mão.'}</p><Link className="btn" href="/projetos">EXPLORE OS PROJETOS</Link></div></section>
-  </main>;
+  </main>
+  </>;
 }

@@ -1,16 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import SeoJsonLd from '@/components/SeoJsonLd';
 
-export const metadata = {
-  title: 'Termos de Uso',
-  description: 'Termos de uso do site Kari Do Canto — Artesanato com Afeto.',
-};
+export const metadata: Metadata = { title: 'Termos de Uso', description: 'Consulte os termos de uso do site Kari Do Canto e as condições para utilização dos conteúdos.', alternates: { canonical: 'https://karidocanto.com.br/termos-de-uso' }, openGraph: { title: 'Termos de Uso', description: 'Consulte os termos de uso do site Kari Do Canto e as condições para utilização dos conteúdos.', url: 'https://karidocanto.com.br/termos-de-uso', type: 'website', images: [{ url: '/api/og-image', alt: 'Termos de Uso' }] }, twitter: { card: 'summary_large_image', title: 'Termos de Uso', description: 'Consulte os termos de uso do site Kari Do Canto e as condições para utilização dos conteúdos.', images: ['/api/og-image'] } };
 
 const styles = `
 .legal{padding:72px 0 96px}.legal-wrap{max-width:900px;margin:0 auto}.legal h1{font-size:clamp(42px,6vw,68px);line-height:1.05;margin:12px 0 18px}.legal h2{font-size:28px;margin:42px 0 12px}.legal p,.legal li{font-size:16px;line-height:1.8;color:#5f5955}.legal ul{padding-left:24px}.legal .updated{font-size:13px;color:#8b817b}.legal a{color:inherit;text-decoration:underline}
 `;
 
 export default function TermosDeUso() {
-  return <main className="legal"><style>{styles}</style><div className="container legal-wrap">
+  return <>
+    <SeoJsonLd type="WebPage" name="Termos de Uso" description="Consulte os termos de uso do site Kari Do Canto e as condições para utilização dos conteúdos." url="/termos-de-uso" image="/api/og-image" breadcrumbs={[{name:'Início',item:'/'},{name:'Termos de Uso',item:'/termos-de-uso'}]} />
+    <main className="legal"><style>{styles}</style><div className="container legal-wrap">
     <span className="eyebrow">Informações legais</span>
     <h1 className="serif">Termos de Uso</h1>
     <p className="updated">Última atualização: 18 de agosto de 2026.</p>
@@ -48,5 +49,6 @@ export default function TermosDeUso() {
 
     <h2 className="serif">10. Contato</h2>
     <p>Para dúvidas, solicitações ou informações relacionadas a estes termos, utilize o <Link href="/contato">canal de contato</Link> disponibilizado no site.</p>
-  </div></main>;
+  </div></main>
+  </>;
 }
