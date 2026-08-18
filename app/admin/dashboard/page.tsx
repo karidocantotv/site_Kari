@@ -1,11 +1,12 @@
 import AdminMediaManager from '@/components/AdminMediaManager';
+import AdminAuthGuard from '@/components/AdminAuthGuard';
 
 export const metadata = { title: 'Painel Vital — KARI Do Canto' };
 
 export default function Dashboard() {
   const analyticsConfigured = Boolean(process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN);
 
-  return <main className="admin">
+  return <AdminAuthGuard><main className="admin">
     <div className="container">
       <div className="adminbox">
         <span className="eyebrow">Painel Vital</span>
@@ -26,5 +27,5 @@ export default function Dashboard() {
         <p style={{ marginTop: 28, fontSize: 11 }}>Criado por Agência Rio de la Plata.</p>
       </div>
     </div>
-  </main>;
+  </main></AdminAuthGuard>;
 }
