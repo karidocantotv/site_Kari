@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound(){return <main className="pageHero"><span className="eyebrow">Ops!</span><h1 className="serif">Essa página saiu do ateliê.</h1><p>Talvez o projeto tenha mudado de lugar. Você ainda pode voltar para os cursos, projetos e dicas da Kari.</p><div className="actions" style={{justifyContent:'center'}}><Link className="btn primary" href="/">VOLTAR AO INÍCIO</Link><Link className="btn" href="/blog">VER O BLOG</Link></div></main>}

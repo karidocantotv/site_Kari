@@ -1,0 +1,12 @@
+name = "kari-do-canto"
+main = ".open-next/worker.js"
+compatibility_date = "2026-08-18"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+binding = "ASSETS"
+directory = ".open-next/assets"
+
+# The custom domain is intentionally configured in Cloudflare after
+# karidocanto.com.br finishes its DNS transition. This keeps CI deploys
+# independent from the current zone state.
