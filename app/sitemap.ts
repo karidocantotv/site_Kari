@@ -24,7 +24,7 @@ const posts = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ['', '/sobre', '/cursos', '/projetos', '/blog', '/contato'];
+  const staticRoutes = ['', '/sobre', '/cursos', '/projetos', '/blog', '/contato', '/politica-de-privacidade', '/termos-de-uso'];
   const now = new Date();
 
   return [
