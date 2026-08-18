@@ -3,10 +3,10 @@ import type { Metadata } from 'next';
 import LeadCapture from '@/components/LeadCapture';
 import SeoJsonLd from '@/components/SeoJsonLd';
 const courses:Record<string,{title:string;tag:string;image:string;desc:string}>= {
- 'feltro-criacoes-com-amor':{title:'Feltro: Criações com Amor',tag:'Feltro',image:'/images/course-feltro.jpg',desc:'Uma introdução prática para criar peças em feltro com mais segurança, composição e acabamento.'},
- 'patchwork-do-basico':{title:'Patchwork: Do básico ao acabamento',tag:'Patchwork',image:'/images/course-patchwork.jpg',desc:'Fundamentos para entender composição, montagem e detalhes que valorizam o projeto.'},
- 'arte-em-madeira':{title:'Arte em Madeira: Decore e transforme',tag:'Arte em madeira',image:'/images/course-madeira.jpg',desc:'Conheça preparação, pintura, texturas e acabamentos para criar peças de madeira com personalidade.'},
- 'scrapbook-memorias':{title:'Scrapbook: Memórias que ficam',tag:'Scrapbook',image:'/images/course-scrapbook.jpg',desc:'Explore papéis, composição e detalhes para transformar lembranças em projetos especiais.'},
+ 'feltro-criacoes-com-amor':{title:'Feltro: Criações com Amor',tag:'Feltro',image:'/images/course-feltro.webp',desc:'Uma introdução prática para criar peças em feltro com mais segurança, composição e acabamento.'},
+ 'patchwork-do-basico':{title:'Patchwork: Do básico ao acabamento',tag:'Patchwork',image:'/images/course-patchwork.webp',desc:'Fundamentos para entender composição, montagem e detalhes que valorizam o projeto.'},
+ 'arte-em-madeira':{title:'Arte em Madeira: Decore e transforme',tag:'Arte em madeira',image:'/images/course-madeira.webp',desc:'Conheça preparação, pintura, texturas e acabamentos para criar peças de madeira com personalidade.'},
+ 'scrapbook-memorias':{title:'Scrapbook: Memórias que ficam',tag:'Scrapbook',image:'/images/course-scrapbook.webp',desc:'Explore papéis, composição e detalhes para transformar lembranças em projetos especiais.'},
 };
 const base='https://karidocanto.com.br';
 export function generateStaticParams(){return Object.keys(courses).map(slug=>({slug}))}

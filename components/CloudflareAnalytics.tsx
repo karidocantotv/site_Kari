@@ -10,7 +10,7 @@ export default function CloudflareAnalytics() {
     <Script
       id="cloudflare-web-analytics"
       src="https://static.cloudflareinsights.com/beacon.min.js"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
       data-cf-beacon={JSON.stringify({ token })}
     />
   );

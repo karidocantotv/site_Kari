@@ -3,10 +3,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import SeoJsonLd from '@/components/SeoJsonLd';
 const projects:Record<string,{title:string;tag:string;image:string}>= {
- 'feltro-criacoes-com-amor':{title:'Criações com Amor',tag:'Feltro',image:'/images/course-feltro.jpg'},
- 'bolsa-patchwork':{title:'Bolsa com acabamento especial',tag:'Patchwork',image:'/images/course-patchwork.jpg'},
- 'caixa-decorativa':{title:'Caixa decorativa floral',tag:'Arte em madeira',image:'/images/course-madeira.jpg'},
- 'album-de-memorias':{title:'Álbum de memórias',tag:'Scrapbook',image:'/images/course-scrapbook.jpg'},
+ 'feltro-criacoes-com-amor':{title:'Criações com Amor',tag:'Feltro',image:'/images/course-feltro.webp'},
+ 'bolsa-patchwork':{title:'Bolsa com acabamento especial',tag:'Patchwork',image:'/images/course-patchwork.webp'},
+ 'caixa-decorativa':{title:'Caixa decorativa floral',tag:'Arte em madeira',image:'/images/course-madeira.webp'},
+ 'album-de-memorias':{title:'Álbum de memórias',tag:'Scrapbook',image:'/images/course-scrapbook.webp'},
 };
 const base='https://karidocanto.com.br';
 export function generateStaticParams(){return Object.keys(projects).map(slug=>({slug}))}

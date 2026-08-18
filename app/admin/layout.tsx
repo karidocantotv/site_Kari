@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import PWARegister from '@/components/PWARegister';
 
 export const metadata: Metadata = {
   title: 'Painel Vital',
@@ -6,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <><PWARegister />{children}</>;
 }

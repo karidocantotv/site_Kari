@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const FALLBACK = 'https://karidocanto.com.br/images/hero.jpg';
+const FALLBACK = 'https://karidocanto.com.br/images/hero.webp';
 
 export async function GET() {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
