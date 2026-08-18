@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export type PublicSiteSettings = Record<string, string>;
 
@@ -11,6 +12,19 @@ export async function getPublicSiteSettings(keys: string[]): Promise<PublicSiteS
   return Object.fromEntries((data ?? []).map((row) => [row.key, row.value ?? '']));
 }
 
+export async function getPublicSiteMedia(slots: string[]) {
+  noStore();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return {};
+  const supabase = createClient(url, key);
+  const { data } = await supabase.from('media_assets').select('slot,path,alt_text,filename').eq('bucket', 'site').in('slot', slots);
+  return Object.fromEntries((data ?? []).map((row) => [row.slot, {
+    url: supabase.storage.from('site').getPublicUrl(row.path).data.publicUrl,
+    alt: row.alt_text ?? '',
+    filename: row.filename ?? '',
+  }]));
+}
 
 export async function getPublicBlogMedia(slug: string) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
