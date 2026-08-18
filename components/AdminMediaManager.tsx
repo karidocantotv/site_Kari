@@ -13,7 +13,7 @@ const BUCKETS = [
   { id: 'blog', label: 'Blog' },
 ];
 
-function publicUrl(bucket:string, path:string) { const supabase=getSupabaseBrowserClient(); return supabase?.storage.from(bucket).getPublicUrl(path).data.publicUrl ?? ''; }
+function publicUrl(supabase: ReturnType<typeof getSupabaseBrowserClient>, bucket:string, path:string) { return supabase?.storage.from(bucket).getPublicUrl(path).data.publicUrl ?? ''; }
 function safeName(name:string) { return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'-').toLowerCase(); }
 
 export default function AdminMediaManager() {
@@ -23,7 +23,7 @@ export default function AdminMediaManager() {
   const [alt,setAlt]=useState(''), [file,setFile]=useState<File|null>(null), [loading,setLoading]=useState(false), [message,setMessage]=useState(''), [error,setError]=useState('');
 
   useEffect(()=>{ if(!supabase)return; supabase.auth.getSession().then(({data})=>setSession(data.session)); const {data:listener}=supabase.auth.onAuthStateChange((_event,nextSession)=>setSession(nextSession)); return ()=>listener.subscription.unsubscribe(); },[supabase]);
-  async function loadAssets(){ if(!supabase||!session)return; const {data,error:fetchError}=await supabase.from('media_assets').select('*').order('created_at',{ascending:false}); if(fetchError)setError(fetchError.message); else setAssets((data??[]) as MediaAsset[]); }
+  async function loadAssets(){ if(!supabase||!session)return; const {data,error:fetchError}=await supabase.from('media_assets').select('*').order('created_at',{ascending:false}).limit(60); if(fetchError)setError(fetchError.message); else setAssets((data??[]) as MediaAsset[]); }
   useEffect(()=>{void loadAssets();},[session]);
   async function login(event:FormEvent){ event.preventDefault(); if(!supabase)return setError('Supabase não está configurada.'); setLoading(true);setError('');setMessage(''); const {error:authError}=await supabase.auth.signInWithPassword({email,password}); if(authError)setError(authError.message);else setMessage('Login realizado.');setLoading(false); }
   async function logout(){await supabase?.auth.signOut();setAssets([]);}
@@ -64,7 +64,7 @@ export default function AdminMediaManager() {
       <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO LOGO…':slot==='site-og-image'?'ATUALIZANDO PREVIEW…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':slot==='site-og-image'?'ATUALIZAR PREVIEW':'ADICIONAR IMAGEM')}</button>
       {message&&<p className="form-status success">{message}</p>}{error&&<p className="form-status error">{error}</p>}
     </form>
-    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':asset.slot==='site-og-image'?'PREVIEW SOCIAL / OPEN GRAPH':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
+    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(supabase,asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':asset.slot==='site-og-image'?'PREVIEW SOCIAL / OPEN GRAPH':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
     {assets.length===0&&<div className="media-empty">Nenhuma imagem cadastrada ainda.</div>}
   </section>;
 }

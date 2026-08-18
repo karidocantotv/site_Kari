@@ -63,10 +63,19 @@ export default function AdminYouTubeManager() {
         ];
       }),
     ];
-    const { error: saveError } = await supabase.from('site_settings').upsert(updates, { onConflict: 'key' });
-    if (saveError) setError(saveError.message);
-    else setMessage('Vídeos do YouTube salvos. A Home será atualizada automaticamente.');
-    setLoading(false);
+    try {
+      const { error: saveError } = await supabase.from('site_settings').upsert(updates, { onConflict: 'key' });
+      if (saveError) { setError(saveError.message); return; }
+      const keys = updates.map((item) => item.key);
+      const { data: confirmation, error: confirmError } = await supabase.from('site_settings').select('key,value').in('key', keys);
+      if (confirmError) { setError(`Salvamento enviado, mas não foi possível confirmar: ${confirmError.message}`); return; }
+      const confirmed = new Map((confirmation ?? []).map((row) => [row.key, row.value ?? '']));
+      if (updates.some((item) => (confirmed.get(item.key) ?? '') !== item.value)) { setError('O Supabase não confirmou todas as configurações. Tente salvar novamente.'); return; }
+      setMessage('YouTube salvo e confirmado. A Home será atualizada automaticamente.');
+    } catch (saveError) {
+      const message = saveError instanceof DOMException && saveError.name === 'AbortError' ? 'A conexão com o Supabase demorou mais de 12 segundos. Verifique a conexão e tente novamente.' : saveError instanceof Error ? saveError.message : 'Não foi possível salvar as configurações.';
+      setError(message);
+    } finally { setLoading(false); }
   }
 
   if (!supabase) return <div className="media-panel"><strong>Supabase não configurada.</strong></div>;
@@ -82,7 +91,7 @@ export default function AdminYouTubeManager() {
           <div className="youtube-admin-card-head"><strong>Vídeo {index + 1}</strong><label className="switch"><input type="checkbox" checked={video.enabled} onChange={(e) => update(index, { enabled: e.target.checked })} /><span>Mostrar na Home</span></label></div>
           <label>ID ou link do vídeo<input value={video.id} onChange={(e) => update(index, { id: e.target.value })} placeholder="https://youtu.be/XXXXXXXXXXX" /></label>
           <label>Título<input value={video.title} onChange={(e) => update(index, { title: e.target.value })} placeholder={`Título do vídeo ${index + 1}`} /></label>
-          {normalizeVideoId(video.id) && <img className="youtube-admin-thumb" src={`https://img.youtube.com/vi/${normalizeVideoId(video.id)}/hqdefault.jpg`} alt="Prévia do vídeo" />}
+          {normalizeVideoId(video.id) && <img className="youtube-admin-thumb" src={`https://i.ytimg.com/vi/${normalizeVideoId(video.id)}/hqdefault.jpg`} alt="Prévia do vídeo" />}
         </div>)}
       </div>
       <button className="btn primary" disabled={loading}>{loading ? 'SALVANDO…' : 'SALVAR YOUTUBE'}</button>

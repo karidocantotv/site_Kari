@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
@@ -10,6 +9,12 @@ type Video = { title: string; videoId: string };
 function normalizeVideoId(value: string) {
   const match = value.trim().match(/(?:v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/);
   return match?.[1] ?? value.trim().replace(/[^A-Za-z0-9_-]/g, '').slice(0, 11);
+}
+
+function YouTubeThumbnail({ videoId, alt, featured = false }: { videoId: string; alt: string; featured?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <div className="video-thumb-fallback" aria-label={alt}><span>▶</span></div>;
+  return <img className={featured ? 'youtube-thumb-image youtube-thumb-featured' : 'youtube-thumb-image'} src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />;
 }
 
 export default function YouTubeGallery() {
@@ -48,12 +53,12 @@ export default function YouTubeGallery() {
   return <>
     <div className="video-gallery">
       <button className="video-feature" onClick={() => openVideo(featured.videoId)} aria-label={`Assistir: ${featured.title}`}>
-        {featured.videoId ? <Image src={`https://img.youtube.com/vi/${featured.videoId}/hqdefault.jpg`} alt={featured.title} fill sizes="(max-width: 800px) 100vw, 760px" /> : <div className="video-empty-image" />}
+        {featured.videoId ? <YouTubeThumbnail videoId={featured.videoId} alt={featured.title} featured /> : <div className="video-empty-image" />}
         <span className="video-overlay" /><span className="play-button">▶</span>
         <span className="video-label">EM DESTAQUE</span><strong>{featured.title}</strong>
       </button>
       {secondary.length > 0 && <div className="video-secondary">{secondary.map((video) => <button className="video-small" key={video.videoId} onClick={() => openVideo(video.videoId)} aria-label={`Assistir: ${video.title}`}>
-        <span className="video-thumb"><Image src={`https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`} alt={video.title} fill sizes="(max-width: 800px) 50vw, 260px" /><span className="play-small">▶</span></span>
+        <span className="video-thumb"><YouTubeThumbnail videoId={video.videoId} alt={video.title} /><span className="play-small">▶</span></span>
         <strong>{video.title}</strong>
       </button>)}</div>}
     </div>

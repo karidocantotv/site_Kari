@@ -60,3 +60,18 @@
 @media(max-width:500px){.media-grid{grid-template-columns:1fr}}
 
 .admin-link-card{display:block;color:inherit}.admin-link-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.settings-form{display:grid;gap:14px;margin-top:22px}.settings-form label{display:flex;flex-direction:column;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.settings-form input,.settings-form textarea{border:1px solid var(--line);padding:12px;background:var(--cream);color:var(--coffee);outline:0;text-transform:none;letter-spacing:0;width:100%}.settings-form textarea{resize:vertical}.settings-form-narrow{max-width:720px}.youtube-admin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.youtube-admin-card{border:1px solid var(--line);background:var(--cream);padding:16px;display:grid;gap:12px}.youtube-admin-card-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.youtube-admin-card-head strong{font-family:'Playfair Display',serif;font-size:20px}.youtube-admin-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:2px}.switch{display:flex!important;flex-direction:row!important;align-items:center;gap:8px!important;text-transform:none!important;letter-spacing:0!important;font-size:11px!important;font-weight:600!important}.switch input{width:18px!important;height:18px!important;margin:0}.video-empty-image{position:absolute;inset:0;background:linear-gradient(135deg,var(--sage),var(--coffee))}@media(max-width:800px){.youtube-admin-grid{grid-template-columns:1fr}}
+
+/* V1.6.1 — Painel Vital: carregamento sob demanda */
+.admin-module-launcher{margin-top:28px;padding:24px;border:1px solid var(--line);background:var(--white)}
+.admin-module-intro{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}
+.admin-module-intro h2{font-size:28px;font-weight:500;margin:7px 0 8px}
+.admin-module-intro p{margin:0;color:var(--muted);font-size:12px;line-height:1.6;max-width:720px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.admin-module-button{width:100%;text-align:left;cursor:pointer;padding:0;font:inherit;color:inherit}
+.admin-module-button:hover{transform:translateY(-2px)}
+.admin-module-button .card-body{min-height:160px}
+.admin-back-button{display:inline-block;margin:20px 0 8px;border:0;background:none;cursor:pointer;padding:0}
+.admin-module-loading{margin-top:20px;min-height:110px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}.admin-module-launcher{padding:18px}.admin-module-button .card-body{min-height:0}}
+
+.youtube-thumb-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}.video-thumb-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e8dfd2;color:#bd684c;font-size:2rem}.youtube-admin-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}

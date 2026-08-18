@@ -1,9 +1,8 @@
-import AdminMediaManager from '@/components/AdminMediaManager';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 import { SITE_VERSION } from '@/lib/site-version';
 import AdminBrand from '@/components/AdminBrand';
 import Link from 'next/link';
-import AdminYouTubeManager from '@/components/AdminYouTubeManager';
+import AdminDashboardModules from '@/components/AdminDashboardModules';
 
 export const metadata = { title: 'Painel Vital — Kari Do Canto' };
 
@@ -23,15 +22,13 @@ export default function Dashboard() {
           </div>
           <div className="analytics-status is-on" title={`Build completo: ${buildVersion}`}><span className="analytics-dot" /> {SITE_VERSION} · Build {buildShort}</div>
         </div>
-        <AdminMediaManager />
+        <AdminDashboardModules />
         <div className="grid4" style={{ marginTop: 24 }}>
-          <Link className="card admin-link-card" href="/admin/configuracao/blog"><div className="card-body"><span className="tag">Conteúdo</span><h3>Blog</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
-          <Link className="card admin-link-card" href="/admin/configuracao/projetos"><div className="card-body"><span className="tag">Conteúdo</span><h3>Projetos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
-          <Link className="card admin-link-card" href="/admin/configuracao/cursos"><div className="card-body"><span className="tag">Produtos</span><h3>Cursos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
-          <div className="card"><div className="card-body"><span className="tag">Redes</span><h3>YouTube</h3><p>Até 5 vídeos controlados pelo Painel Vital, sem autoplay.</p><span className="more">CONFIGURADO ABAIXO →</span></div></div>
+          <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/blog"><div className="card-body"><span className="tag">Conteúdo</span><h3>Blog</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
+          <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/projetos"><div className="card-body"><span className="tag">Conteúdo</span><h3>Projetos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
+          <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/cursos"><div className="card-body"><span className="tag">Produtos</span><h3>Cursos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
           <div className="card"><div className="card-body"><span className="tag">CRM</span><h3>Leads</h3><p>Captura preparada para Supabase e futura gestão comercial.</p></div></div>
         </div>
-        <AdminYouTubeManager />
         <section className="analytics-panel" aria-labelledby="analytics-title">
           <div className="analytics-panel-head"><div><span className="eyebrow">Métricas</span><h2 id="analytics-title" className="serif">Cloudflare Web Analytics</h2><p>Monitoramento de visitas e experiência real dos visitantes do site.</p></div><span className={`analytics-status ${analyticsConfigured ? 'is-on' : ''}`}><span className="analytics-dot" /> {analyticsConfigured ? 'Configurado' : 'Aguardando token'}</span></div>
           <div className="analytics-grid"><div className="analytics-card"><span>Web Analytics</span><strong>{analyticsConfigured ? 'Ativo' : 'Não configurado'}</strong><small>Beacon RUM instalado no site.</small></div><div className="analytics-card"><span>Core Web Vitals</span><strong>Monitorados</strong><small>LCP, INP, CLS, TTFB e FCP.</small></div><div className="analytics-card"><span>Relatórios</span><strong>Cloudflare</strong><small>Os dados e gráficos completos ficam no painel do Cloudflare.</small></div></div>

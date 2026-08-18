@@ -1,13 +1,8 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
+import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 export default function AdminAuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -15,6 +10,11 @@ export default function AdminAuthGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      router.replace('/admin/login');
+      return () => { active = false; };
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       if (!data.session) router.replace('/admin/login');

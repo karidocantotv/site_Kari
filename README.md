@@ -49,7 +49,7 @@ O `/admin/dashboard` inclui o Gerenciador de Imagens integrado ao Supabase Stora
 
 Execute `supabase/media_migration.sql` uma vez no Supabase. Depois crie um usuário administrador em **Authentication → Users** no Supabase para entrar no painel.
 
-## V1.6 — Painel Vital e YouTube
+## V1.6.1 — Painel Vital otimizado
 
 - Painel Vital com configuração de até 5 vídeos do YouTube.
 - A Home usa as capas dos vídeos cadastrados no painel.
