@@ -34,16 +34,17 @@ export default function AdminMediaManager() {
     if(!file.type.startsWith('image/'))return setError('Selecione um arquivo de imagem.');
     if(file.size>12*1024*1024)return setError('A imagem deve ter no máximo 12 MB.');
     const isLogo=bucket==='site'&&slot==='site-logo';
-    setLoading(true);setError('');setMessage(isLogo?'Atualizando logo do site...':'Enviando imagem...');
-    const filename=isLogo?'site-logo':`${Date.now()}-${safeName(file.name)}`;
-    const path=isLogo?'brand/site-logo':(slot?`${safeName(slot)}/${filename}`:filename);
-    if(isLogo){ await supabase.from('media_assets').delete().eq('bucket','site').eq('path','brand/site-logo'); }
-    const {error:uploadError}=await supabase.storage.from(bucket).upload(path,file,{upsert:isLogo,contentType:file.type,cacheControl:isLogo?'0':'31536000'});
+    const isOgImage=bucket==='site'&&slot==='site-og-image';
+    const isSiteIdentity=isLogo||isOgImage;
+    setLoading(true);setError('');setMessage(isLogo?'Atualizando logo do site...':isOgImage?'Atualizando imagem de preview social...':'Enviando imagem...');
+    const filename=isLogo?'site-logo':isOgImage?'og-image':`${Date.now()}-${safeName(file.name)}`;
+    const path=isLogo?'brand/site-logo':isOgImage?'brand/og-image':(slot?`${safeName(slot)}/${filename}`:filename);
+    const {error:uploadError}=await supabase.storage.from(bucket).upload(path,file,{upsert:isSiteIdentity,contentType:file.type,cacheControl:isSiteIdentity?'0':'31536000'});
     if(uploadError){setError(uploadError.message);setLoading(false);return;}
     const image=await createImageBitmap(file).catch(()=>null);
-    const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||'Logo Kari Do Canto — Artesanato com Afeto',slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
+    const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||(isLogo?'Logo Kari Do Canto — Artesanato com Afeto':'Imagem de preview social — Kari Do Canto'),slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
     image?.close();
-    if(insertError){if(!isLogo)await supabase.storage.from(bucket).remove([path]);setError(insertError.message);}else{setMessage(isLogo?'Logo atualizado. O site passa a usar este arquivo automaticamente.':'Imagem adicionada com sucesso.');setFile(null);setAlt('');setSlot('');await loadAssets();}
+    if(insertError){if(!isSiteIdentity)await supabase.storage.from(bucket).remove([path]);setError(insertError.message);}else{if(isSiteIdentity)await supabase.from('media_assets').delete().eq('bucket','site').eq('path',path);setMessage(isLogo?'Logo atualizado. O site passa a usar este arquivo automaticamente.':isOgImage?'Imagem de preview social atualizada. O novo preview será usado automaticamente.':'Imagem adicionada com sucesso.');setFile(null);setAlt('');setSlot('');await loadAssets();}
     setLoading(false);
   }
   async function remove(asset:MediaAsset){if(!supabase||!window.confirm(`Excluir ${asset.filename}?`))return;setLoading(true);setError('');const {error:storageError}=await supabase.storage.from(asset.bucket).remove([asset.path]);if(storageError){setError(storageError.message);setLoading(false);return;}const {error:dbError}=await supabase.from('media_assets').delete().eq('id',asset.id);if(dbError)setError(dbError.message);else setAssets(current=>current.filter(item=>item.id!==asset.id));setLoading(false);}
@@ -54,15 +55,16 @@ export default function AdminMediaManager() {
   return <section className="media-panel">
     <div className="media-head"><div><span className="eyebrow">Conteúdo visual</span><h2 className="serif">Gerenciador de imagens</h2><p>Troque imagens do site pelo painel sem editar código.</p></div><button className="btn" onClick={logout}>SAIR</button></div>
     <div className="media-logo-callout"><div><span className="eyebrow">Identidade</span><h3 className="serif">Logo do site</h3><p>Envie o arquivo original da logo. Ele será usado automaticamente no header e no footer, sem redesenho ou conversão.</p></div><strong>site-logo</strong></div>
+    <div className="media-logo-callout"><div><span className="eyebrow">Compartilhamento</span><h3 className="serif">Preview social / Open Graph</h3><p>Envie a imagem que aparecerá quando o site for compartilhado no WhatsApp, Facebook, LinkedIn e outros serviços. Recomendado: 1200 × 630 px.</p></div><strong>site-og-image</strong></div>
     <form className="media-upload" onSubmit={upload}>
       <label>Local<select value={bucket} onChange={e=>{setBucket(e.target.value);if(e.target.value!=='site')setSlot('');}}>{BUCKETS.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-      <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
+      <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="site-og-image">PREVIEW SOCIAL / OPEN GRAPH</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
       <label className="media-file">Imagem<input type="file" accept="image/svg+xml,image/jpeg,image/png,image/webp,image/avif" onChange={onFileChange} required/></label>
-      <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'Kari Do Canto — Artesanato com Afeto':'Descrição da imagem'}/></label>
-      <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':'ADICIONAR IMAGEM')}</button>
+      <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'Kari Do Canto — Artesanato com Afeto':slot==='site-og-image'?'Preview social — Kari Do Canto':'Descrição da imagem'}/></label>
+      <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO LOGO…':slot==='site-og-image'?'ATUALIZANDO PREVIEW…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':slot==='site-og-image'?'ATUALIZAR PREVIEW':'ADICIONAR IMAGEM')}</button>
       {message&&<p className="form-status success">{message}</p>}{error&&<p className="form-status error">{error}</p>}
     </form>
-    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
+    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':asset.slot==='site-og-image'?'PREVIEW SOCIAL / OPEN GRAPH':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
     {assets.length===0&&<div className="media-empty">Nenhuma imagem cadastrada ainda.</div>}
   </section>;
 }

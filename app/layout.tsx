@@ -22,6 +22,18 @@ export const metadata: Metadata = {
     url: 'https://karidocanto.com.br',
     siteName: 'Kari Do Canto',
     type: 'website',
+    images: [{
+      url: '/api/og-image',
+      width: 1200,
+      height: 630,
+      alt: 'Kari Do Canto — Artesanato com Afeto',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kari Do Canto | Artesanato com Afeto',
+    description: 'Ideias, cursos e passo a passo para criar para a casa com amor e afeto.',
+    images: ['/api/og-image'],
   },
   icons: { icon: '/icon.svg', apple: '/apple-icon.svg' },
   applicationName: 'Kari Do Canto',
