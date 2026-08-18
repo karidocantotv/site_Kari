@@ -1,0 +1,3 @@
+import type { Metadata } from 'next'; import LeadCapture from '@/components/LeadCapture';
+export const metadata:Metadata={title:'Contacto',description:'Ponte en contacto con Kari Do Canto.',alternates:{canonical:'https://karidocanto.com.br/es/contato'}};
+export default function ContatoEs(){return <><section className="pageHero"><span className="eyebrow">Hablemos</span><h1 className="serif">Contacto</h1><p>¿Tienes una pregunta, sugerencia o quieres saber más sobre los cursos?</p></section><section className="section"><div className="container"><LeadCapture source="contact-page" /></div></section></>}

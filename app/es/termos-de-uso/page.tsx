@@ -1,0 +1,1 @@
+import type {Metadata} from 'next'; export const metadata:Metadata={title:'Términos de uso',robots:{index:false}}; export default function Page(){return <section className="pageHero"><span className="eyebrow">Legal</span><h1 className="serif">Términos de uso</h1><p>Esta página presenta los términos de uso de Kari Do Canto.</p></section>}

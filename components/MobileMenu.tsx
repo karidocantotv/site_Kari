@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const links = [
   ['INÍCIO', '/'],
@@ -13,6 +14,10 @@ const links = [
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname() || '/';
+  const es = pathname === '/es' || pathname.startsWith('/es/');
+  const path = (href:string) => es ? `/es${href === '/' ? '' : href}` : href;
+  const labels = es ? ['INICIO','SOBRE KARI','CURSOS','PROYECTOS','BLOG','CONTACTO'] : ['INÍCIO','SOBRE Kari','CURSOS','PROJETOS','BLOG','CONTATO'];
 
   useEffect(() => {
     if (!open) return;
@@ -44,10 +49,11 @@ export default function MobileMenu() {
         <div className="mobile-nav-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
       )}
       <nav id="mobile-navigation" className="mobile-nav" aria-label="Navegação mobile" aria-hidden={!open}>
-        {links.map(([label, href]) => (
-          <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>
+        {links.map(([, href], i) => (
+          <a key={href} href={path(href)} onClick={() => setOpen(false)}>{labels[i]}</a>
         ))}
-        <a className="btn primary" href="/cursos" onClick={() => setOpen(false)}>ÁREA DO ALUNO</a>
+        <div className="mobile-language"><a href={es ? (pathname.replace(/^\/es/, '') || '/') : pathname}>🇧🇷 PT</a><span>|</span><a href={es ? pathname : `/es${pathname === '/' ? '' : pathname}`}>🌎 ES</a></div>
+        <a className="btn primary" href={path('/cursos')} onClick={() => setOpen(false)}>{es ? 'ÁREA DEL ALUMNO' : 'ÁREA DO ALUNO'}</a>
       </nav>
     </div>
   );

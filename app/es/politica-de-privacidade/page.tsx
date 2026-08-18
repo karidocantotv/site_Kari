@@ -1,0 +1,1 @@
+import type {Metadata} from 'next'; export const metadata:Metadata={title:'Política de privacidad',robots:{index:false}}; export default function Page(){return <section className="pageHero"><span className="eyebrow">Legal</span><h1 className="serif">Política de privacidad</h1><p>Esta página presenta la política de privacidad de Kari Do Canto.</p></section>}

@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export type ContentType = 'blog' | 'curso';
+export type Locale = 'pt-BR' | 'es-LA';
 export type ContentItem = {
   id: string;
   content_type: ContentType;
@@ -91,4 +92,47 @@ export async function getPublicContentMedia(type: ContentType, slug: string) {
     alt: row.alt_text ?? '',
     filename: row.filename ?? '',
   }]));
+}
+
+
+export async function getPublicContentLocalized(type: ContentType, locale: Locale) {
+  const items = await getPublicContent(type);
+  if (locale !== 'es-LA' || !items.length) return items;
+  const supabase = client();
+  if (!supabase) return items;
+  const ids = items.map(item => item.id).filter(id => !id.startsWith('fallback-'));
+  if (!ids.length) return items.map(localizeFallbackItem);
+  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps').eq('language','es-LA').in('content_id', ids);
+  const translations = new Map((data ?? []).map(row => [row.content_id, row]));
+  return items.map(item => {
+    const t = translations.get(item.id);
+    if (!t) return localizeFallbackItem(item);
+    return { ...item, title: t.title || item.title, category: t.category || item.category, summary: t.summary || item.summary, content: t.content || item.content, steps: Array.isArray(t.steps) ? t.steps.map(String) : item.steps };
+  });
+}
+
+export async function getPublicContentLocalizedBySlug(type: ContentType, slug: string, locale: Locale) {
+  const item = await getPublicContentBySlug(type, slug);
+  if (!item || locale !== 'es-LA') return item;
+  if (item.id.startsWith('fallback-')) return localizeFallbackItem(item);
+  const supabase = client();
+  if (!supabase) return localizeFallbackItem(item);
+  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps').eq('language','es-LA').eq('content_id', item.id).maybeSingle();
+  if (!data) return localizeFallbackItem(item);
+  return { ...item, title: data.title || item.title, category: data.category || item.category, summary: data.summary || item.summary, content: data.content || item.content, steps: Array.isArray(data.steps) ? data.steps.map(String) : item.steps };
+}
+
+function localizeFallbackItem(item: ContentItem): ContentItem {
+  const translations: Record<string, Partial<ContentItem>> = {
+    'cestinho-de-tecido': { title:'Cestita de tela: paso a paso completo', category:'Paso a paso', summary:'Del material al acabado, una pieza bonita para organizar y decorar el hogar.', content:'Un proyecto delicado y funcional para practicar montaje, composición y acabado.' },
+    'como-escolher-linhas': { title:'Cómo elegir los mejores hilos', category:'Consejos', summary:'Una guía para elegir materiales y hacer que cada proyecto sea aún más especial.', content:'La elección del hilo influye en la costura, el acabado y hasta en la apariencia final de la pieza.' },
+    'pintura-em-madeira': { title:'Pintura sobre madera: técnicas y cuidados', category:'Técnicas', summary:'Preparación, pintura y protección para piezas hechas para durar.', content:'La preparación y el acabado marcan la diferencia cuando quieres crear una pieza bonita y duradera.' },
+    'flores-de-feltro': { title:'Flores de fieltro: ideas para crear', category:'Inspiración', summary:'Detalles hechos a mano para regalar, decorar y transformar ambientes.', content:'Las flores de fieltro son versátiles y permiten jugar con colores, tamaños y composiciones.' },
+    'feltro-criacoes-com-amor': { title:'Fieltro: Creaciones con Amor', category:'Fieltro', summary:'Proyectos delicados, técnicas esenciales y acabados para crear con cariño.', content:'Una introducción práctica para crear piezas de fieltro con más seguridad, composición y acabado.' },
+    'patchwork-do-basico': { title:'Patchwork: del básico al acabado', category:'Patchwork', summary:'Aprende fundamentos y detalles para transformar telas en piezas para el hogar.', content:'Fundamentos para entender composición, montaje y detalles que valorizan el proyecto.' },
+    'arte-em-madeira': { title:'Arte en madera: decora y transforma', category:'Arte en madera', summary:'Pintura, texturas y acabados para crear piezas con personalidad.', content:'Conoce preparación, pintura, texturas y acabados para crear piezas de madera con personalidad.' },
+    'scrapbook-memorias': { title:'Scrapbook: recuerdos que permanecen', category:'Scrapbook', summary:'Papeles, composición y detalles para transformar historias en proyectos llenos de afecto.', content:'Explora papeles, composición y detalles para transformar recuerdos en proyectos especiales.' },
+  };
+  const t = translations[item.slug];
+  return t ? { ...item, ...t } : item;
 }
