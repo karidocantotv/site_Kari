@@ -43,7 +43,7 @@ function Footer() {
     <footer className="footer"><div className="container footer-grid">
       <div><Link href="/" className="logo logo-footer" aria-label="KARI Do Canto — início"><LogoImage /></Link><p>Artesanato, criatividade e aprendizado para você criar com as próprias mãos.</p></div>
       <div><h4>Navegação</h4><p><Link href="/sobre">Sobre Kari</Link><br/><Link href="/cursos">Cursos</Link><br/><Link href="/projetos">Projetos</Link><br/><Link href="/blog">Blog</Link></p></div>
-      <div><h4>Ajuda</h4><p><Link href="/contato">Contato</Link><br/>Perguntas frequentes<br/>Política de privacidade<br/>Termos de uso</p></div>
+      <div><h4>Ajuda</h4><p><Link href="/contato">Contato</Link><br/><Link href="/politica-de-privacidade">Política de privacidade</Link><br/><Link href="/termos-de-uso">Termos de uso</Link></p></div>
       <div><h4>Siga nas redes</h4><p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p></div>
     </div><div className="container footer-bottom"><span>© 2026 KARI Do Canto. Todos os direitos reservados.</span><span>Desenvolvido com ♥ pela Agência Rio de la Plata</span></div></footer>
   </>;
