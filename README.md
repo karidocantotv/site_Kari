@@ -32,3 +32,8 @@ Execute o SQL principal e `supabase/lead_capture_migration.sql` no projeto Supab
 ## Deploy
 
 O workflow `.github/workflows/deploy-cloudflare.yml` executa instalação, typecheck e deploy OpenNext para Cloudflare Workers.
+
+
+## Next.js 15 compatibility
+
+Dynamic route `params` are handled as Promises across App Router pages and metadata generation, matching Next.js 15.

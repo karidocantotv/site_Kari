@@ -10,8 +10,9 @@ const courses: Record<string, { title: string; tag: string }> = {
 
 export function generateStaticParams() { return Object.keys(courses).map((slug) => ({ slug })); }
 
-export default function Comprar({ params }: { params: { slug: string } }) {
-  const course = courses[params.slug];
+export default async function Comprar({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const course = courses[slug];
   if (!course) notFound();
   return <section className="purchase-gate"><div className="container purchase-card">
     <span className="eyebrow">Área de compra · {course.tag}</span>
