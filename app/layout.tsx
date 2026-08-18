@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import NewsletterForm from '@/components/NewsletterForm';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
+import LogoImage from '@/components/LogoImage';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://karidocanto.com.br'),
@@ -25,7 +26,7 @@ function Header() {
     <div className="topbar"><div className="container topbar-inner"><span>✦ Cursos e projetos de artesanato com quem ensinou na televisão</span><span className="top-social">Instagram · YouTube · Facebook</span></div></div>
     <header className="nav">
       <div className="container nav-inner">
-        <Link href="/" className="logo logo-mark" aria-label="KARI Do Canto — início"><img src="/brand/kari-do-canto.svg" alt="KARI Do Canto — Artesanato com Afeto" /></Link>
+        <Link href="/" className="logo logo-mark" aria-label="KARI Do Canto — início"><LogoImage /></Link>
         <nav className="links" aria-label="Navegação principal">
           <Link href="/">INÍCIO</Link><Link href="/sobre">SOBRE KARI</Link><Link href="/cursos">CURSOS</Link><Link href="/projetos">PROJETOS</Link><Link href="/blog">BLOG</Link><Link href="/contato">CONTATO</Link>
           <Link className="btn primary" href="/cursos">ÁREA DO ALUNO</Link>
@@ -40,7 +41,7 @@ function Footer() {
   return <>
     <section className="newsletter"><div className="container newsletter-inner"><div><strong>Receba inspiração no seu e-mail.</strong><span>Dicas, novidades, projetos e novos cursos.</span></div><NewsletterForm /></div></section>
     <footer className="footer"><div className="container footer-grid">
-      <div><Link href="/" className="logo logo-footer" aria-label="KARI Do Canto — início"><img src="/brand/kari-do-canto.svg" alt="KARI Do Canto — Artesanato com Afeto" /></Link><p>Artesanato, criatividade e aprendizado para você criar com as próprias mãos.</p></div>
+      <div><Link href="/" className="logo logo-footer" aria-label="KARI Do Canto — início"><LogoImage /></Link><p>Artesanato, criatividade e aprendizado para você criar com as próprias mãos.</p></div>
       <div><h4>Navegação</h4><p><Link href="/sobre">Sobre Kari</Link><br/><Link href="/cursos">Cursos</Link><br/><Link href="/projetos">Projetos</Link><br/><Link href="/blog">Blog</Link></p></div>
       <div><h4>Ajuda</h4><p><Link href="/contato">Contato</Link><br/>Perguntas frequentes<br/>Política de privacidade<br/>Termos de uso</p></div>
       <div><h4>Siga nas redes</h4><p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p></div>
