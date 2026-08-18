@@ -1,24 +1,18 @@
-import Link from 'next/link';
-
 export const metadata = {
   title: 'Política de Privacidade',
-  description: 'Política de Privacidade da KARI Do Canto — Artesanato com Afeto.',
+  description: 'Política de Privacidade da Kari Do Canto — Artesanato com Afeto.',
 };
 
-const styles = `
-.legal{padding:72px 0 96px}.legal-wrap{max-width:900px;margin:0 auto}.legal h1{font-size:clamp(42px,6vw,68px);line-height:1.05;margin:12px 0 18px}.legal h2{font-size:28px;margin:42px 0 12px}.legal p,.legal li{font-size:16px;line-height:1.8;color:#5f5955}.legal ul{padding-left:24px}.legal .updated{font-size:13px;color:#8b817b}.legal a{color:inherit;text-decoration:underline}
-`;
-
 export default function PoliticaDePrivacidade() {
-  return <main className="legal"><style>{styles}</style><div className="container legal-wrap">
+  return <main className="legal"><div className="container legal-wrap">
     <span className="eyebrow">Privacidade e transparência</span>
     <h1 className="serif">Política de Privacidade</h1>
     <p className="updated">Última atualização: 18 de agosto de 2026.</p>
 
-    <p>A KARI Do Canto — Artesanato com Afeto valoriza a privacidade e busca tratar dados pessoais de forma transparente, segura e compatível com a legislação brasileira, especialmente a Lei Geral de Proteção de Dados Pessoais (LGPD).</p>
+    <p>A Kari Do Canto — Artesanato com Afeto valoriza a privacidade e busca tratar dados pessoais de forma transparente, segura e compatível com a legislação brasileira, especialmente a Lei Geral de Proteção de Dados Pessoais (LGPD).</p>
 
     <h2 className="serif">1. Quem somos</h2>
-    <p>Esta política se aplica ao site <strong>karidocanto.com.br</strong> e aos recursos digitais disponibilizados pela KARI Do Canto. Para solicitações relacionadas aos seus dados pessoais, utilize o <Link href="/contato">canal de contato</Link> disponibilizado no site.</p>
+    <p>Esta política se aplica ao site <strong>karidocanto.com.br</strong> e aos recursos digitais disponibilizados pela Kari Do Canto. Para solicitações relacionadas aos seus dados pessoais, utilize o <a href="/contato">canal de contato</a> disponibilizado no site.</p>
 
     <h2 className="serif">2. Quais dados podemos coletar</h2>
     <p>Dependendo da forma como você utiliza o site, podemos tratar:</p>
@@ -40,7 +34,7 @@ export default function PoliticaDePrivacidade() {
     <p>O tratamento será realizado conforme a base legal aplicável a cada finalidade, incluindo consentimento, execução de contrato, cumprimento de obrigação legal ou regulatória e legítimo interesse, quando cabível.</p>
 
     <h2 className="serif">4. Newsletter e consentimento</h2>
-    <p>Ao se cadastrar na newsletter, o usuário fornece voluntariamente nome e e-mail e declara consentimento para receber comunicações relacionadas a conteúdos, novidades, projetos e cursos da KARI Do Canto. O cadastro pode ser cancelado a qualquer momento por meio do canal de contato disponibilizado no site ou pelos mecanismos de descadastro eventualmente presentes nas comunicações.</p>
+    <p>Ao se cadastrar na newsletter, o usuário fornece voluntariamente nome e e-mail e declara consentimento para receber comunicações relacionadas a conteúdos, novidades, projetos e cursos da Kari Do Canto. O cadastro pode ser cancelado a qualquer momento por meio do canal de contato disponibilizado no site ou pelos mecanismos de descadastro eventualmente presentes nas comunicações.</p>
 
     <h2 className="serif">5. Ferramentas e fornecedores</h2>
     <p>O site pode utilizar fornecedores de tecnologia para hospedagem, armazenamento, autenticação, formulários, envio de comunicações e análise de desempenho. Atualmente, recursos do site podem utilizar serviços como Supabase para armazenamento e gerenciamento de dados e Cloudflare Web Analytics para métricas de navegação.</p>
@@ -60,7 +54,7 @@ export default function PoliticaDePrivacidade() {
 
     <h2 className="serif">10. Direitos do titular</h2>
     <p>Nos termos da LGPD, o titular pode solicitar, conforme aplicável, confirmação da existência de tratamento, acesso aos dados, correção, anonimização, bloqueio ou eliminação, portabilidade, informação sobre compartilhamentos, revogação do consentimento e demais direitos previstos em lei.</p>
-    <p>Alguns pedidos podem estar sujeitos a limitações legais. Para exercer seus direitos, utilize o <Link href="/contato">canal de contato</Link> do site e informe, sempre que possível, o pedido que deseja realizar e os dados necessários para sua identificação.</p>
+    <p>Alguns pedidos podem estar sujeitos a limitações legais. Para exercer seus direitos, utilize o <a href="/contato">canal de contato</a> do site e informe, sempre que possível, o pedido que deseja realizar e os dados necessários para sua identificação.</p>
 
     <h2 className="serif">11. Dados de crianças e adolescentes</h2>
     <p>O site não é direcionado especificamente à coleta de dados de crianças. Caso seja identificado tratamento inadequado de dados de criança ou adolescente, serão adotadas as medidas cabíveis de acordo com a legislação aplicável e o melhor interesse do titular.</p>
@@ -72,6 +66,6 @@ export default function PoliticaDePrivacidade() {
     <p>Esta política observa, entre outras normas aplicáveis, a Lei nº 13.709/2018 (LGPD) e a legislação brasileira pertinente à proteção da privacidade e dos consumidores.</p>
 
     <h2 className="serif">14. Contato</h2>
-    <p>Para dúvidas ou solicitações sobre privacidade e proteção de dados, utilize o <Link href="/contato">canal de contato</Link> disponibilizado no site.</p>
+    <p>Para dúvidas ou solicitações sobre privacidade e proteção de dados, utilize o <a href="/contato">canal de contato</a> disponibilizado no site.</p>
   </div></main>;
 }
