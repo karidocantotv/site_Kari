@@ -14,6 +14,7 @@ export type ContentItem = {
   steps: string[];
   published: boolean;
   sort_order: number;
+  video_url?: string;
 };
 
 export const FALLBACK_BLOG: ContentItem[] = [
@@ -41,7 +42,7 @@ export async function getPublicContent(type: ContentType) {
   const fallback = type === 'blog' ? FALLBACK_BLOG : FALLBACK_COURSES;
   const supabase = client();
   if (!supabase) return fallback;
-  const { data, error } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order').eq('content_type', type).eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+  const { data, error } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order,video_url').eq('content_type', type).eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: true });
   if (error) return fallback;
   return (data ?? []).map(normalize);
 }
@@ -51,7 +52,7 @@ export async function getPublicContentBySlug(type: ContentType, slug: string) {
   const fallback = (type === 'blog' ? FALLBACK_BLOG : FALLBACK_COURSES).find((item) => item.slug === slug);
   const supabase = client();
   if (!supabase) return fallback;
-  const { data, error } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order').eq('content_type', type).eq('slug', slug).eq('published', true).maybeSingle();
+  const { data, error } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order,video_url').eq('content_type', type).eq('slug', slug).eq('published', true).maybeSingle();
   if (error) return fallback;
   return data ? normalize(data) : undefined;
 }
@@ -102,12 +103,12 @@ export async function getPublicContentLocalized(type: ContentType, locale: Local
   if (!supabase) return items;
   const ids = items.map(item => item.id).filter(id => !id.startsWith('fallback-'));
   if (!ids.length) return items.map(localizeFallbackItem);
-  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps').eq('language','es-LA').in('content_id', ids);
+  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps,video_url').eq('language','es-LA').in('content_id', ids);
   const translations = new Map((data ?? []).map(row => [row.content_id, row]));
   return items.map(item => {
     const t = translations.get(item.id);
     if (!t) return localizeFallbackItem(item);
-    return { ...item, title: t.title || item.title, category: t.category || item.category, summary: t.summary || item.summary, content: t.content || item.content, steps: Array.isArray(t.steps) ? t.steps.map(String) : item.steps };
+    return { ...item, title: t.title || item.title, category: t.category || item.category, summary: t.summary || item.summary, content: t.content || item.content, steps: Array.isArray(t.steps) ? t.steps.map(String) : item.steps, video_url: t.video_url || item.video_url };
   });
 }
 
@@ -117,9 +118,9 @@ export async function getPublicContentLocalizedBySlug(type: ContentType, slug: s
   if (item.id.startsWith('fallback-')) return localizeFallbackItem(item);
   const supabase = client();
   if (!supabase) return localizeFallbackItem(item);
-  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps').eq('language','es-LA').eq('content_id', item.id).maybeSingle();
+  const { data } = await supabase.from('content_translations').select('content_id,title,category,summary,content,steps,video_url').eq('language','es-LA').eq('content_id', item.id).maybeSingle();
   if (!data) return localizeFallbackItem(item);
-  return { ...item, title: data.title || item.title, category: data.category || item.category, summary: data.summary || item.summary, content: data.content || item.content, steps: Array.isArray(data.steps) ? data.steps.map(String) : item.steps };
+  return { ...item, title: data.title || item.title, category: data.category || item.category, summary: data.summary || item.summary, content: data.content || item.content, steps: Array.isArray(data.steps) ? data.steps.map(String) : item.steps, video_url: data.video_url || item.video_url };
 }
 
 function localizeFallbackItem(item: ContentItem): ContentItem {

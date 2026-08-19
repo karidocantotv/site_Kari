@@ -18,3 +18,7 @@ drop policy if exists "Public can read content translations" on public.content_t
 create policy "Public can read content translations" on public.content_translations for select using (true);
 drop policy if exists "Authenticated can manage content translations" on public.content_translations;
 create policy "Authenticated can manage content translations" on public.content_translations for all to authenticated using (true) with check (true);
+
+-- V2.2: optional locale-specific YouTube video for each content item
+alter table public.content_items add column if not exists video_url text not null default '';
+alter table public.content_translations add column if not exists video_url text not null default '';

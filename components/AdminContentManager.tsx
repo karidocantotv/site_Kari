@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 type ContentType = 'blog' | 'curso';
-type Item = { id:string; content_type:ContentType; slug:string; title:string; category:string; summary:string; content:string; steps:string[]; published:boolean; sort_order:number };
+type Item = { id:string; content_type:ContentType; slug:string; title:string; category:string; summary:string; content:string; steps:string[]; published:boolean; sort_order:number; video_url?:string };
 
 const FALLBACK_IMAGE: Record<ContentType,string> = { blog:'/images/blog-cestinho.webp', curso:'/images/course-feltro.webp' };
 const BUCKET: Record<ContentType,string> = { blog:'blog', curso:'courses' };
@@ -15,7 +15,7 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
   const plural = type === 'blog' ? 'artigos' : 'cursos';
   const [items, setItems] = useState<Item[]>([]);
   const [editing, setEditing] = useState<Item | null>(null);
-  const [form, setForm] = useState({ slug:'', title:'', category:'', summary:'', content:'', steps:'', esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', published:true, sort_order:1 });
+  const [form, setForm] = useState({ slug:'', title:'', category:'', summary:'', content:'', steps:'', esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', videoUrl:'', esVideoUrl:'', published:true, sort_order:1 });
   const [cover, setCover] = useState<File | null>(null);
   const [inside, setInside] = useState<File | null>(null);
   const [zip, setZip] = useState<File | null>(null);
@@ -29,24 +29,24 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
 
   async function load() {
     if (!supabase) return;
-    const { data, error: e } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order').eq('content_type', type).order('sort_order', { ascending:true }).order('created_at', { ascending:true });
+    const { data, error: e } = await supabase.from('content_items').select('id,content_type,slug,title,category,summary,content,steps,published,sort_order,video_url').eq('content_type', type).order('sort_order', { ascending:true }).order('created_at', { ascending:true });
     if (e) { setError(e.message); return; }
     setItems((data ?? []) as Item[]);
   }
   useEffect(() => { void load(); }, [type]);
 
   function startNew() {
-    setEditing(null); setForm({ slug:'', title:'', category:'', summary:'', content:'', steps:'', esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', published:true, sort_order:Math.max(1, items.length+1) });
+    setEditing(null); setForm({ slug:'', title:'', category:'', summary:'', content:'', steps:'', esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', videoUrl:'', esVideoUrl:'', published:true, sort_order:Math.max(1, items.length+1) });
     setCover(null); setInside(null); setZip(null); setCoverAlt(''); setInsideAlt(''); setCurrentMedia({}); setCurrentZip(''); setMessage(''); setError('');
   }
   function startEdit(item: Item) {
-    setEditing(item); setForm({ slug:item.slug, title:item.title, category:item.category, summary:item.summary, content:item.content, steps:item.steps.join('\n'), esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', published:item.published, sort_order:item.sort_order }); void loadTranslation(item.id);
+    setEditing(item); setForm({ slug:item.slug, title:item.title, category:item.category, summary:item.summary, content:item.content, steps:item.steps.join('\n'), esTitle:'', esCategory:'', esSummary:'', esContent:'', esSteps:'', videoUrl:item.video_url||'', esVideoUrl:'', published:item.published, sort_order:item.sort_order }); void loadTranslation(item.id);
     setCover(null); setInside(null); setZip(null); setCoverAlt(''); setInsideAlt(''); setCurrentMedia({}); setCurrentZip(''); setMessage(''); setError('');
     void loadMedia(item.slug);
   }
   async function loadTranslation(id:string) {
     if (!supabase) return;
-    const { data } = await supabase.from('content_translations').select('title,category,summary,content,steps').eq('content_id',id).eq('language','es-LA').maybeSingle();
+    const { data } = await supabase.from('content_translations').select('title,category,summary,content,steps,video_url').eq('content_id',id).eq('language','es-LA').maybeSingle();
     setForm(prev => ({...prev, esTitle:data?.title||'', esCategory:data?.category||'', esSummary:data?.summary||'', esContent:data?.content||'', esSteps:Array.isArray(data?.steps)?data.steps.join('\n'):''}));
   }
 
@@ -103,11 +103,11 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
       const slug = form.slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
       if(!slug || !form.title.trim()) throw new Error('Título e slug são obrigatórios.');
       const steps = form.steps.split('\n').map(s=>s.trim()).filter(Boolean);
-      const payload={ content_type:type, slug, title:form.title.trim(), category:form.category.trim(), summary:form.summary.trim(), content:form.content.trim(), steps, published:form.published, sort_order:Number(form.sort_order)||1 };
-      const { data, error:e } = await supabase.from('content_items').upsert(payload,{onConflict:'content_type,slug'}).select('id,content_type,slug,title,category,summary,content,steps,published,sort_order').single();
+      const payload={ content_type:type, slug, title:form.title.trim(), category:form.category.trim(), summary:form.summary.trim(), content:form.content.trim(), steps, video_url:form.videoUrl.trim(), published:form.published, sort_order:Number(form.sort_order)||1 };
+      const { data, error:e } = await supabase.from('content_items').upsert(payload,{onConflict:'content_type,slug'}).select('id,content_type,slug,title,category,summary,content,steps,published,sort_order,video_url').single();
       if(e) throw e;
       if (data && (form.esTitle.trim() || form.esSummary.trim() || form.esContent.trim() || form.esSteps.trim())) {
-        const { error:te } = await supabase.from('content_translations').upsert({content_id:data.id,language:'es-LA',title:form.esTitle.trim(),category:form.esCategory.trim(),summary:form.esSummary.trim(),content:form.esContent.trim(),steps:form.esSteps.split('\n').map(s=>s.trim()).filter(Boolean),updated_at:new Date().toISOString()},{onConflict:'content_id,language'});
+        const { error:te } = await supabase.from('content_translations').upsert({content_id:data.id,language:'es-LA',title:form.esTitle.trim(),category:form.esCategory.trim(),summary:form.esSummary.trim(),content:form.esContent.trim(),steps:form.esSteps.split('\n').map(s=>s.trim()).filter(Boolean),video_url:form.esVideoUrl.trim(),updated_at:new Date().toISOString()},{onConflict:'content_id,language'});
         if(te) throw te;
       } else if (data) {
         await supabase.from('content_translations').delete().eq('content_id',data.id).eq('language','es-LA');
@@ -152,7 +152,7 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
           <label className="full">Conteúdo introdutório<textarea rows={5} value={form.content} onChange={e=>setForm({...form,content:e.target.value})} /></label>
           <label className="full">Contenido introductorio (ES)<textarea rows={5} value={form.esContent} onChange={e=>setForm({...form,esContent:e.target.value})} /></label>
           <label className="full">Passos / tópicos (um por linha)<textarea rows={7} value={form.steps} onChange={e=>setForm({...form,steps:e.target.value})} /></label>
-          <label className="full">Pasos / temas (uno por línea) (ES)<textarea rows={7} value={form.esSteps} onChange={e=>setForm({...form,esSteps:e.target.value})} /></label>
+          <label className="full">Pasos / temas (uno por línea) (ES)<textarea rows={7} value={form.esSteps} onChange={e=>setForm({...form,esSteps:e.target.value})} /></label><label>Vídeo YouTube (PT)<input value={form.videoUrl} onChange={e=>setForm({...form,videoUrl:e.target.value})} placeholder="URL do vídeo" /></label><label>Vídeo YouTube (ES)<input value={form.esVideoUrl} onChange={e=>setForm({...form,esVideoUrl:e.target.value})} placeholder="URL del vídeo" /></label>
           <label className="switch full"><input type="checkbox" checked={form.published} onChange={e=>setForm({...form,published:e.target.checked})} /><span>Publicar este conteúdo</span></label>
         </div>
         <div className="content-media-grid">

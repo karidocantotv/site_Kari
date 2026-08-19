@@ -82,3 +82,19 @@ Ele cria `content_items`, aplica RLS e migra os quatro artigos e quatro cursos e
 - Se houver cinco ou mais conteúdos, a Home mostra os quatro primeiros por ordem; as páginas `/blog` e `/cursos` mostram todos os publicados.
 - Novos artigos/cursos publicados passam a gerar suas próprias URLs e entram no sitemap automaticamente.
 - O conteúdo antigo permanece como fallback somente se o Supabase estiver indisponível durante a renderização.
+
+
+## V2.1.0 — YouTube bilíngue
+- Painel com 5 espaços independentes de YouTube para Português e Español LATAM.
+- Home PT usa as chaves `youtube_*`; Home `/es` usa `youtube_es_*`.
+- Canal do YouTube pode ser configurado separadamente por idioma.
+- Execute `supabase/site_settings_migration.sql` para criar as novas chaves espanholas.
+
+## V2.2.0 — Conteúdo bilíngue completo
+
+- Blog e Cursos possuem conteúdo PT-BR e Español LATAM através de `content_translations`.
+- O painel permite editar título, categoria, resumo, conteúdo e passos em ambos os idiomas.
+- Cursos podem ter vídeo YouTube diferente em português e espanhol.
+- As páginas `/es/blog`, `/es/blog/[slug]`, `/es/cursos` e `/es/cursos/[slug]` usam a tradução espanhola quando cadastrada.
+- O vídeo específico de um curso acompanha o idioma da página.
+- Execute `supabase/i18n_migration.sql` uma vez para adicionar os campos de vídeo por idioma.
