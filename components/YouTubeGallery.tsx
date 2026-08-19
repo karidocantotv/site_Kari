@@ -42,5 +42,34 @@ export default function YouTubeGallery({ videos = [], channel = CHANNEL_URL }: {
         {active === 'channel' ? <div className="video-channel-placeholder"><span className="eyebrow">YouTube Kari do Canto</span><h3 className="serif">Cadastre os vídeos no Painel Vital.</h3><p>A Home exibe até 5 vídeos configurados no painel. Quando nenhum vídeo estiver cadastrado, o canal oficial continua disponível.</p><a className="btn primary" href={channel} target="_blank" rel="noreferrer">ABRIR O YOUTUBE ↗</a></div> : <div className="video-frame-wrap"><iframe src={`https://www.youtube-nocookie.com/embed/${active}?rel=0`} title="Vídeo Kari do Canto" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div>}
       </div>
     </div>}
+
+    <style jsx>{`
+      .video-feature {
+        aspect-ratio: 16 / 9 !important;
+        min-height: 0 !important;
+      }
+      .youtube-thumb-featured {
+        aspect-ratio: 16 / 9 !important;
+        object-fit: cover;
+      }
+      .video-secondary {
+        align-items: stretch;
+      }
+      .video-small {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .video-thumb {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        flex: 0 0 auto;
+      }
+      .video-small strong {
+        min-height: 2.4em;
+      }
+    `}</style>
   </>;
 }
