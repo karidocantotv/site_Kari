@@ -22,8 +22,11 @@ export default function BlogCarousel({ posts, media, locale = 'pt' }: { posts: P
     if (restoreScrollY.current === null) return;
     const y = restoreScrollY.current;
     restoreScrollY.current = null;
+    const restore = () => window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+    restore();
     window.requestAnimationFrame(() => {
-      window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+      restore();
+      window.requestAnimationFrame(restore);
     });
   }, [safePage]);
 
@@ -34,30 +37,32 @@ export default function BlogCarousel({ posts, media, locale = 'pt' }: { posts: P
 
   return (
     <>
-      <div className="grid4 blog-carousel-grid">
-        {visiblePosts.map((p) => {
-          const href = prefix + p.slug;
-          const image = media[`blog:${p.slug}:cover`];
-          return (
-            <article className="card" key={p.id}>
-              <Link href={href} className="blog-card-image-link" aria-label={`${p.title} — ${labels.read}`} style={{ display: 'block', cursor: 'pointer' }}>
-                <img src={image?.url || '/images/blog-cestinho.webp'} alt={image?.alt || p.title} loading="lazy" decoding="async" width="200" height="118" style={{ cursor: 'pointer' }} />
-              </Link>
-              <div className="card-body">
-                <span className="tag">{p.category}</span>
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
-                <Link className="more" href={href}>{labels.read}</Link>
-              </div>
-            </article>
-          );
-        })}
+      <div className="blog-carousel-grid-wrap" style={{ overflowAnchor: 'none' }}>
+        <div className="grid4 blog-carousel-grid" style={{ overflowAnchor: 'none' }}>
+          {visiblePosts.map((p) => {
+            const href = prefix + p.slug;
+            const image = media[`blog:${p.slug}:cover`];
+            return (
+              <article className="card" key={p.id}>
+                <Link href={href} className="blog-card-image-link" aria-label={`${p.title} — ${labels.read}`} style={{ display: 'block', cursor: 'pointer' }}>
+                  <img src={image?.url || '/images/blog-cestinho.webp'} alt={image?.alt || p.title} loading="lazy" decoding="async" width="200" height="118" style={{ cursor: 'pointer' }} />
+                </Link>
+                <div className="card-body">
+                  <span className="tag">{p.category}</span>
+                  <h3>{p.title}</h3>
+                  <p>{p.summary}</p>
+                  <Link className="more" href={href}>{labels.read}</Link>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
       {totalPages > 1 && (
-        <div className="blog-carousel-controls" aria-label={locale === 'es' ? 'Navegación del blog' : 'Navegação do blog'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, marginTop: 30 }}>
-          <button type="button" className="blog-carousel-arrow" onClick={() => changePage((safePage - 1 + totalPages) % totalPages)} aria-label={labels.prev} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--white)', color: 'var(--terracotta)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>←</button>
+        <div className="blog-carousel-controls" aria-label={locale === 'es' ? 'Navegación del blog' : 'Navegação do blog'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, marginTop: 30, overflowAnchor: 'none' }}>
+          <button type="button" className="blog-carousel-arrow" onPointerDown={(event) => event.currentTarget.blur()} onClick={(event) => { event.preventDefault(); event.currentTarget.blur(); changePage((safePage - 1 + totalPages) % totalPages); }} aria-label={labels.prev} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--white)', color: 'var(--terracotta)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>←</button>
           <span className="blog-carousel-page" aria-live="polite" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', color: 'var(--muted)' }}>{safePage + 1} / {totalPages}</span>
-          <button type="button" className="blog-carousel-arrow" onClick={() => changePage((safePage + 1) % totalPages)} aria-label={labels.next} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--terracotta)', color: 'white', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>→</button>
+          <button type="button" className="blog-carousel-arrow" onPointerDown={(event) => event.currentTarget.blur()} onClick={(event) => { event.preventDefault(); event.currentTarget.blur(); changePage((safePage + 1) % totalPages); }} aria-label={labels.next} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--terracotta)', color: 'white', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>→</button>
         </div>
       )}
     </>
