@@ -3,6 +3,7 @@ import { SITE_VERSION } from '@/lib/site-version';
 import AdminBrand from '@/components/AdminBrand';
 import Link from 'next/link';
 import AdminDashboardModules from '@/components/AdminDashboardModules';
+import AdminCloudflareAnalytics from '@/components/AdminCloudflareAnalytics';
 
 export const metadata = { title: 'Painel Vital — Kari Do Canto' };
 
@@ -30,8 +31,8 @@ export default function Dashboard() {
           <Link prefetch={false} className="card admin-link-card" href="/admin/newsletter"><div className="card-body"><span className="tag">CRM</span><h3>Leads</h3><p>Leads e inscritos são separados por idioma no módulo Newsletter.</p><span className="more">ABRIR NEWSLETTER →</span></div></Link>
         </div>
         <section className="analytics-panel" aria-labelledby="analytics-title">
-          <div className="analytics-panel-head"><div><span className="eyebrow">Métricas</span><h2 id="analytics-title" className="serif">Cloudflare Web Analytics</h2><p>Monitoramento de visitas e experiência real dos visitantes do site.</p></div><span className={`analytics-status ${analyticsConfigured ? 'is-on' : ''}`}><span className="analytics-dot" /> {analyticsConfigured ? 'Configurado' : 'Aguardando token'}</span></div>
-          <div className="analytics-grid"><div className="analytics-card"><span>Web Analytics</span><strong>{analyticsConfigured ? 'Ativo' : 'Não configurado'}</strong><small>Beacon RUM instalado no site.</small></div><div className="analytics-card"><span>Core Web Vitals</span><strong>Monitorados</strong><small>LCP, INP, CLS, TTFB e FCP.</small></div><div className="analytics-card"><span>Relatórios</span><strong>Cloudflare</strong><small>Os dados e gráficos completos ficam no painel do Cloudflare.</small></div></div>
+          <div className="analytics-panel-head"><div><span className="eyebrow">Métricas</span><h2 id="analytics-title" className="serif">Cloudflare Web Analytics</h2><p>Dados reais de visitas e experiência dos visitantes do site.</p></div><span className={`analytics-status ${analyticsConfigured ? 'is-on' : ''}`}><span className="analytics-dot" /> {analyticsConfigured ? 'Configurado' : 'Aguardando token'}</span></div>
+          {analyticsConfigured ? <AdminCloudflareAnalytics /> : <div className="analytics-card"><strong>Analytics não configurado</strong><small>Adicione o token do Cloudflare Web Analytics para carregar os dados.</small></div>}
           <a className="btn primary analytics-link" href="https://dash.cloudflare.com/?to=/:account/analytics/web-analytics" target="_blank" rel="noreferrer">ABRIR WEB ANALYTICS ↗</a>
         </section>
         <p style={{ marginTop: 28, fontSize: 11 }}>{SITE_VERSION} · Build completo: {buildVersion} · Criado por Agência Rio de la Plata.</p>
