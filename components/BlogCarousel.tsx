@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 type Post = { id: string; slug: string; title: string; summary: string; category: string };
 type MediaMap = Record<string, { url?: string; alt?: string } | undefined>;
 
 export default function BlogCarousel({ posts, media, locale = 'pt' }: { posts: Post[]; media: MediaMap; locale?: 'pt' | 'es' }) {
   const [page, setPage] = useState(0);
+  const restoreScrollY = useRef<number | null>(null);
   const pageSize = 4;
   const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
   const safePage = Math.min(page, totalPages - 1);
@@ -16,6 +17,20 @@ export default function BlogCarousel({ posts, media, locale = 'pt' }: { posts: P
   const labels = locale === 'es'
     ? { prev: 'Anterior', next: 'Siguiente', read: 'LEER ARTÍCULO →' }
     : { prev: 'Anterior', next: 'Próximo', read: 'LER ARTIGO →' };
+
+  useLayoutEffect(() => {
+    if (restoreScrollY.current === null) return;
+    const y = restoreScrollY.current;
+    restoreScrollY.current = null;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+    });
+  }, [safePage]);
+
+  const changePage = (nextPage: number) => {
+    restoreScrollY.current = window.scrollY;
+    setPage(nextPage);
+  };
 
   return (
     <>
@@ -40,9 +55,9 @@ export default function BlogCarousel({ posts, media, locale = 'pt' }: { posts: P
       </div>
       {totalPages > 1 && (
         <div className="blog-carousel-controls" aria-label={locale === 'es' ? 'Navegación del blog' : 'Navegação do blog'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, marginTop: 30 }}>
-          <button type="button" className="blog-carousel-arrow" onClick={() => setPage((safePage - 1 + totalPages) % totalPages)} aria-label={labels.prev} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--white)', color: 'var(--terracotta)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>←</button>
+          <button type="button" className="blog-carousel-arrow" onClick={() => changePage((safePage - 1 + totalPages) % totalPages)} aria-label={labels.prev} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--white)', color: 'var(--terracotta)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>←</button>
           <span className="blog-carousel-page" aria-live="polite" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', color: 'var(--muted)' }}>{safePage + 1} / {totalPages}</span>
-          <button type="button" className="blog-carousel-arrow" onClick={() => setPage((safePage + 1) % totalPages)} aria-label={labels.next} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--terracotta)', color: 'white', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>→</button>
+          <button type="button" className="blog-carousel-arrow" onClick={() => changePage((safePage + 1) % totalPages)} aria-label={labels.next} style={{ width: 42, height: 42, border: '1px solid var(--terracotta)', background: 'var(--terracotta)', color: 'white', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>→</button>
         </div>
       )}
     </>
