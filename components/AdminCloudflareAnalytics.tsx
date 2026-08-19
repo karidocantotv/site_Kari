@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 type Data = { pageviews: number; visits: number; vitals: { lcp: number | null; inp: number | null; cls: number | null; fcp: number | null; ttfb: number | null }; topPages: { path: string; count: number }[]; countries: { country: string; count: number }[] };
-
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR').format(n);
 const ms = (n: number | null) => n == null ? '—' : `${Math.round(n)} ms`;
 const cls = (n: number | null) => n == null ? '—' : n.toFixed(2);
@@ -16,13 +16,17 @@ export default function AdminCloudflareAnalytics() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
-    fetch(`/api/admin/analytics?range=${range}`, { cache: 'no-store' })
-      .then(async (r) => { const json = await r.json(); if (!r.ok) throw new Error(json.error || 'Não foi possível carregar os dados.'); return json; })
-      .then((json) => { if (!cancelled) setData(json); })
-      .catch((e) => { if (!cancelled) setError(e.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+    setLoading(true); setError('');
+    const load = async () => {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+      if (!session?.access_token) throw new Error('Sessão expirada. Faça login novamente.');
+      const response = await fetch(`/api/admin/analytics?range=${range}`, { cache: 'no-store', headers: { Authorization: `Bearer ${session.access_token}` } });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.error || 'Não foi possível carregar os dados.');
+      return json;
+    };
+    load().then((json) => { if (!cancelled) setData(json); }).catch((e) => { if (!cancelled) setError(e.message); }).finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [range]);
 
@@ -34,7 +38,7 @@ export default function AdminCloudflareAnalytics() {
     {error && <p role="alert">{error}</p>}
     {data && !loading && <>
       <div className="analytics-grid">
-        <div className="analytics-card"><span>Visitas</span><strong>{fmt(data.visits)}</strong><small>Visitantes/visitas registrados pelo RUM.</small></div>
+        <div className="analytics-card"><span>Visitas</span><strong>{fmt(data.visits)}</strong><small>Visitas registradas pelo RUM.</small></div>
         <div className="analytics-card"><span>Visualizações</span><strong>{fmt(data.pageviews)}</strong><small>Páginas visualizadas no período.</small></div>
         <div className="analytics-card"><span>LCP · P75</span><strong>{ms(data.vitals.lcp)}</strong><small>Largest Contentful Paint.</small></div>
         <div className="analytics-card"><span>INP · P75</span><strong>{ms(data.vitals.inp)}</strong><small>Interaction to Next Paint.</small></div>
