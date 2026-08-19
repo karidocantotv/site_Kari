@@ -41,6 +41,7 @@ export default function LeadCapture({ courseSlug, courseTitle, source = 'site', 
 
     const tracking = getTracking();
     const sourcePage = window.location.pathname;
+    const locale = sourcePage === '/es' || sourcePage.startsWith('/es/') ? 'es-LA' : 'pt-BR';
 
     const { error } = await supabase
       .from('leads')
@@ -50,6 +51,7 @@ export default function LeadCapture({ courseSlug, courseTitle, source = 'site', 
         whatsapp: whatsapp.trim() || null,
         course_slug: courseSlug || null,
         source,
+        locale,
         source_page: sourcePage,
         ...tracking,
         consent_marketing: consent,

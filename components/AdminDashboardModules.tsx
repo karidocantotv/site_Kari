@@ -7,6 +7,10 @@ const AdminMediaManager = dynamic(() => import('@/components/AdminMediaManager')
   loading: () => <ModuleLoading label="Carregando gerenciador de imagens…" />,
 });
 
+const AdminNewsletterManager = dynamic(() => import('@/components/AdminNewsletterManager'), {
+  loading: () => <ModuleLoading label="Carregando newsletter…" />,
+});
+
 const AdminYouTubeManager = dynamic(() => import('@/components/AdminYouTubeManager'), {
   loading: () => <ModuleLoading label="Carregando configuração do YouTube…" />,
 });
@@ -15,7 +19,7 @@ function ModuleLoading({ label }: { label: string }) {
   return <section className="media-panel admin-module-loading" aria-live="polite"><span className="eyebrow">Painel Vital</span><p>{label}</p></section>;
 }
 
-type Module = 'media' | 'youtube';
+type Module = 'media' | 'youtube' | 'newsletter';
 
 export default function AdminDashboardModules() {
   const [module, setModule] = useState<Module | null>(null);
@@ -32,12 +36,15 @@ export default function AdminDashboardModules() {
         <button type="button" className="card admin-module-button" onClick={() => setModule('youtube')}>
           <div className="card-body"><span className="tag">Redes</span><h3>YouTube</h3><p>Cadastre até 5 vídeos que aparecem na Home, sem autoplay.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div>
         </button>
+        <button type="button" className="card admin-module-button" onClick={() => setModule('newsletter')}>
+          <div className="card-body"><span className="tag">Comunicação</span><h3>Newsletter</h3><p>Separe inscritos PT/ES, crie campanhas e envie e-mails.</p><span className="more">ABRIR NEWSLETTER →</span></div>
+        </button>
       </div>
     </section>;
   }
 
   return <section>
     <button type="button" className="more admin-back-button" onClick={() => setModule(null)}>← VOLTAR ÀS FERRAMENTAS</button>
-    {module === 'media' ? <AdminMediaManager /> : <AdminYouTubeManager />}
+    {module === 'media' ? <AdminMediaManager /> : module === 'youtube' ? <AdminYouTubeManager /> : <AdminNewsletterManager />}
   </section>;
 }

@@ -17,7 +17,7 @@ export default function NewsletterForm() {
     setStatus(sending);
     const supabase = getSupabaseBrowserClient();
     if (!supabase) { setStatus(es ? 'El boletín todavía no está configurado.' : 'Newsletter ainda não configurada.'); return; }
-    const { error } = await supabase.from('newsletter_subscribers').insert({ email: email.trim().toLowerCase(), name: name.trim() || null, source: 'footer', consent: true });
+    const { error } = await supabase.from('newsletter_subscribers').insert({ email: email.trim().toLowerCase(), name: name.trim() || null, source: 'footer', consent: true, locale: es ? 'es-LA' : 'pt-BR' });
     const alreadyRegistered = error?.code === '23505';
     setStatus(error && !alreadyRegistered ? (es ? 'No fue posible registrarte ahora.' : 'Não foi possível cadastrar agora.') : alreadyRegistered ? (es ? 'Tu correo ya está registrado.' : 'Seu e-mail já está cadastrado.') : (es ? '¡Listo! Tu registro se realizó correctamente.' : 'Pronto! Seu cadastro foi realizado.'));
     if (!error || alreadyRegistered) { setEmail(''); setName(''); }

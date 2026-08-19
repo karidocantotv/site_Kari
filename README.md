@@ -8,7 +8,7 @@ Esta versão usa Next.js 15.5.21, compatível com `@opennextjs/cloudflare` 1.20.
 
 ## Integrações
 
-- Supabase para leads, newsletter e conteúdo.
+- Supabase para leads, newsletter e conteúdo. Brevo para envio das newsletters.
 - Cloudflare Web Analytics (RUM) via `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`.
 - Painel `/admin/dashboard` com status do Analytics e atalho para o Web Analytics do Cloudflare.
 - Cloudflare Workers via OpenNext.
@@ -98,3 +98,8 @@ Ele cria `content_items`, aplica RLS e migra os quatro artigos e quatro cursos e
 - As páginas `/es/blog`, `/es/blog/[slug]`, `/es/cursos` e `/es/cursos/[slug]` usam a tradução espanhola quando cadastrada.
 - O vídeo específico de um curso acompanha o idioma da página.
 - Execute `supabase/i18n_migration.sql` uma vez para adicionar os campos de vídeo por idioma.
+
+
+## Newsletter / Brevo
+
+A V2.3 usa a API SMTP transacional da Brevo para os envios. Configure no Cloudflare as variáveis `BREVO_API_KEY`, `NEWSLETTER_FROM_EMAIL`, `NEWSLETTER_FROM_NAME` e `NEXT_PUBLIC_SITE_URL`. A chave da Brevo nunca deve ser colocada no código ou no ZIP.
