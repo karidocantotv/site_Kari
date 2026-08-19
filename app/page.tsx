@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import YouTubeGallery from '@/components/YouTubeGallery';
 import InstagramProfile from '@/components/InstagramProfile';
+import BlogCarousel from '@/components/BlogCarousel';
 import { getPublicSiteMedia, getPublicSiteSettings } from '@/lib/site-settings';
 import { getPublicContent, getPublicContentCovers } from '@/lib/content';
 import type { Metadata } from 'next';
@@ -17,7 +18,6 @@ import SeoJsonLd from '@/components/SeoJsonLd';
 function fillWithComingSoon<T>(items: T[], size = 4) {
   return [...items.slice(0, size), ...Array.from({ length: Math.max(0, size - items.length) }, (_, i) => ({ __comingSoon: true, id: `coming-${i}` } as T))];
 }
-
 
 export default async function Home() {
   const [settings, blogItems, courseItems] = await Promise.all([
@@ -76,7 +76,7 @@ export default async function Home() {
 
     <section className="section video-section"><div className="container"><div className="section-head"><span className="eyebrow">Vídeos da Kari</span><h2 className="serif">Aprenda, assista e crie.</h2><p>Conteúdo do YouTube em uma galeria leve: o player só é carregado quando você decide assistir.</p></div><YouTubeGallery videos={youtubeVideos} channel={youtubeChannel} /></div></section>
 
-    <section className="section alt" hidden={!blogEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Conteúdo gratuito</span><h2 className="serif">{settings.blog_title || 'Dicas e passo a passo para a casa'}</h2><p>{settings.blog_description || 'Aprenda uma técnica, escolha seus materiais e encontre inspiração para o próximo projeto.'}</p></div><div className="grid4">{fillWithComingSoon(blogItems).map((p:any)=><article className={p.__comingSoon ? 'card coming-soon-card' : 'card'} key={p.id}>{p.__comingSoon ? <div className="coming-soon"><span className="tag">Em breve</span><h3 className="serif">Novo conteúdo chegando</h3><p>Em breve teremos um novo artigo com dicas, técnicas e inspiração para você.</p></div> : <><img src={blogMedia[`blog:${p.slug}:cover`]?.url || '/images/blog-cestinho.webp'} alt={blogMedia[`blog:${p.slug}:cover`]?.alt || p.title} loading="lazy" decoding="async" width="200" height="118"/><div className="card-body"><span className="tag">{p.category}</span><h3>{p.title}</h3><p>{p.summary}</p><Link className="more" href={'/blog/'+p.slug}>LER ARTIGO →</Link></div></>}</article>)}</div><div className="center"><Link className="btn" href="/blog">VER TODOS OS ARTIGOS</Link></div></div></section>
+    <section className="section alt" hidden={!blogEnabled}><div className="container"><div className="section-head"><span className="eyebrow">Conteúdo gratuito</span><h2 className="serif">{settings.blog_title || 'Dicas e passo a passo para a casa'}</h2><p>{settings.blog_description || 'Aprenda uma técnica, escolha seus materiais e encontre inspiração para o próximo projeto.'}</p></div><BlogCarousel posts={blogItems} media={blogMedia} locale="pt" /><div className="center"><Link className="btn" href="/blog">VER TODOS OS ARTIGOS</Link></div></div></section>
 
     <section className="section social-section"><div className="container social-grid"><div><div className="section-head social-head"><span className="eyebrow">Siga a Kari</span><h2 className="serif">Mais ideias para criar com afeto.</h2><p>Continue acompanhando a Kari nas redes e descubra novos projetos, dicas e inspirações para a sua casa.</p></div><div className="social-links"><a className="btn primary" href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YOUTUBE ↗</a><a className="btn" href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">INSTAGRAM ↗</a></div></div><InstagramProfile /></div></section>
 
