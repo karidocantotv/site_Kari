@@ -1,10 +1,10 @@
 'use client';
+import { usePathname } from 'next/navigation';
 import LanguageAwareLogo from '@/components/LanguageAwareLogo';
 import LanguageAwareFooterLinks from '@/components/LanguageAwareFooterLinks';
 import NewsletterForm from '@/components/NewsletterForm';
 
 export default function LanguageAwareFooter({ siteVersion, buildShort }: { siteVersion: string; buildShort: string }) {
-  const { usePathname } = require('next/navigation') as typeof import('next/navigation');
   const pathname = usePathname() || '/';
   const es = pathname === '/es' || pathname.startsWith('/es/');
   return <>
