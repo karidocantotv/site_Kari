@@ -18,17 +18,17 @@ export default function LanguageAwareFooter({ siteVersion, buildShort }: { siteV
       </div>
     </section>
     <footer className="footer">
-      <div className="container footer-grid">
-        <div>
+      <div className="container footer-grid" style={{ alignItems: 'start' }}>
+        <div style={{ minWidth: 0, marginBottom: 24 }}>
           <LanguageAwareLogo />
           <p>{es ? 'Artesanía, creatividad y aprendizaje para que crees con tus propias manos.' : 'Artesanato, criatividade e aprendizado para você criar com as próprias mãos.'}</p>
         </div>
-        <div>
-          <h2 className="footer-heading">{es ? 'Navegación' : 'Navegação'}</h2>
+        <div style={{ minWidth: 0, paddingTop: 4 }}>
+          <h2 className="footer-heading" style={{ position: 'relative', zIndex: 1, background: 'var(--cream)', paddingTop: 4 }}>{es ? 'Navegación' : 'Navegação'}</h2>
           <LanguageAwareFooterLinks />
         </div>
-        <div>
-          <h2 className="footer-heading">{es ? 'Sígueme en redes' : 'Siga nas redes'}</h2>
+        <div style={{ minWidth: 0, paddingTop: 4 }}>
+          <h2 className="footer-heading" style={{ position: 'relative', zIndex: 1, background: 'var(--cream)', paddingTop: 4 }}>{es ? 'Sígueme en redes' : 'Siga nas redes'}</h2>
           <p><a href="https://www.instagram.com/karidocanto.craft/" target="_blank" rel="noreferrer">Instagram</a><br/><a href="https://www.youtube.com/@KaridoCanto" target="_blank" rel="noreferrer">YouTube</a></p>
         </div>
       </div>
