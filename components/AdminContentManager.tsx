@@ -74,17 +74,52 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
     if(!supabase)throw new Error('Supabase não está configurada.');
     if(!file.type.startsWith('image/'))throw new Error('Selecione somente imagens.');
     if(file.size>12*1024*1024)throw new Error('Cada imagem deve ter no máximo 12 MB.');
-    const bucket=BUCKET[type];const path=`posts/${slug}/${type}-${slot}.${file.name.split('.').pop()||'webp'}`;const slotName=`${type==='blog'?'blog':'course'}:${slug}:${slot}`;
-    const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:true,contentType:file.type,cacheControl:'31536000'});if(e)throw e;
+
+    const bucket=BUCKET[type];
+    const slotName=`${type==='blog'?'blog':'course'}:${slug}:${slot}`;
+    const extension=(file.name.split('.').pop()||'webp').toLowerCase().replace(/[^a-z0-9]/g,'')||'webp';
+    const path=`posts/${slug}/${type}-${slot}-${Date.now()}.${extension}`;
+
+    // Upload com URL nova a cada troca. Isso evita que o navegador/CDN devolva a capa antiga.
+    const {data:oldRows}=await supabase.from('media_assets').select('path').eq('bucket',bucket).eq('slot',slotName);
+    const oldPaths=(oldRows??[]).map((row:any)=>row.path).filter((oldPath:string)=>oldPath!==path);
+
+    const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type,cacheControl:'31536000'});
+    if(e)throw e;
+
     const bitmap=await createImageBitmap(file).catch(()=>null);
-    const {error:dbError}=await supabase.from('media_assets').upsert({bucket,path,filename:file.name,alt_text:alt.trim()||null,slot:slotName,width:bitmap?.width??null,height:bitmap?.height??null,mime_type:file.type,size_bytes:file.size},{onConflict:'bucket,path'});bitmap?.close();if(dbError)throw dbError;
+    const {error:dbError}=await supabase.from('media_assets').upsert({bucket,path,filename:file.name,alt_text:alt.trim()||null,slot:slotName,width:bitmap?.width??null,height:bitmap?.height??null,mime_type:file.type,size_bytes:file.size},{onConflict:'bucket,path'});
+    bitmap?.close();
+    if(dbError)throw dbError;
+
+    // Mantém somente a mídia atual para o slot e remove arquivos antigos.
+    if(oldPaths.length){
+      await supabase.from('media_assets').delete().eq('bucket',bucket).eq('slot',slotName).neq('path',path);
+      await supabase.storage.from(bucket).remove(oldPaths);
+    }
   }
 
   async function uploadZip(file:File,slug:string){
     if(!supabase)throw new Error('Supabase não está configurada.');
-    const ok=file.name.toLowerCase().endsWith('.zip')||file.type==='application/zip'||file.type==='application/x-zip-compressed';if(!ok)throw new Error('Selecione somente arquivos ZIP.');if(file.size>50*1024*1024)throw new Error('O arquivo ZIP deve ter no máximo 50 MB.');
-    const path=`posts/${slug}/molde.zip`;const {error:e}=await supabase.storage.from('blog').upload(path,file,{upsert:true,contentType:'application/zip',cacheControl:'31536000'});if(e)throw e;
-    const {error:dbError}=await supabase.from('media_assets').upsert({bucket:'blog',path,filename:file.name,slot:`blog:${slug}:download`,mime_type:'application/zip',size_bytes:file.size},{onConflict:'bucket,path'});if(dbError)throw dbError;
+    const ok=file.name.toLowerCase().endsWith('.zip')||file.type==='application/zip'||file.type==='application/x-zip-compressed';
+    if(!ok)throw new Error('Selecione somente arquivos ZIP.');
+    if(file.size>50*1024*1024)throw new Error('O arquivo ZIP deve ter no máximo 50 MB.');
+
+    const bucket='blog';
+    const slotName=`blog:${slug}:download`;
+    const path=`posts/${slug}/molde-${Date.now()}.zip`;
+    const {data:oldRows}=await supabase.from('media_assets').select('path').eq('bucket',bucket).eq('slot',slotName);
+    const oldPaths=(oldRows??[]).map((row:any)=>row.path).filter((oldPath:string)=>oldPath!==path);
+
+    const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:false,contentType:'application/zip',cacheControl:'31536000'});
+    if(e)throw e;
+    const {error:dbError}=await supabase.from('media_assets').upsert({bucket,path,filename:file.name,slot:slotName,mime_type:'application/zip',size_bytes:file.size},{onConflict:'bucket,path'});
+    if(dbError)throw dbError;
+
+    if(oldPaths.length){
+      await supabase.from('media_assets').delete().eq('bucket',bucket).eq('slot',slotName).neq('path',path);
+      await supabase.storage.from(bucket).remove(oldPaths);
+    }
   }
 
   async function save(event:FormEvent){
