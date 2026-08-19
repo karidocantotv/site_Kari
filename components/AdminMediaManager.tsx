@@ -53,8 +53,6 @@ export default function AdminMediaManager() {
       if(!isSiteIdentity)await supabase.storage.from(bucket).remove([path]);
       setError(insertError.message);
     }else{
-      // A named slot is a single active location. Remove older rows for the
-      // same slot so the panel and the public site cannot disagree.
       if (previousSlotRows?.length) {
         await supabase.from('media_assets').delete().in('id', previousSlotRows.map(row => row.id));
         await supabase.storage.from(bucket).remove(previousSlotRows.map(row => row.path));
@@ -84,14 +82,14 @@ export default function AdminMediaManager() {
     <div className="media-logo-callout"><div><span className="eyebrow">Compartilhamento</span><h3 className="serif">Preview social / Open Graph</h3><p>Envie a imagem que aparecerá quando o site for compartilhado no WhatsApp, Facebook, LinkedIn e outros serviços. Recomendado: 1200 × 630 px.</p></div><strong>site-og-image</strong></div>
     <form className="media-upload" onSubmit={upload}>
       <label>Local<select value={bucket} onChange={e=>{setBucket(e.target.value);if(e.target.value!=='site')setSlot('');}}>{BUCKETS.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-      <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="site-og-image">PREVIEW SOCIAL / OPEN GRAPH</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="home-about">Sobre a Kari — Home + página /sobre</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
+      <label>Posição / uso<select value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Imagem comum</option><option value="site-logo">LOGO DO SITE</option><option value="site-og-image">PREVIEW SOCIAL / OPEN GRAPH</option><option value="home-hero">Home — hero</option><option value="home-video">Home — vídeo</option><option value="home-about">Sobre a Kari — Home + página /sobre</option><option value="404">Página 404 — imagem</option><option value="project">Projeto</option><option value="blog">Blog</option></select></label>
       {bucket === 'site' && <p className="form-status" style={{ marginTop: -8 }}>Para trocar uma imagem da Home, escolha a posição correspondente. “Imagem comum” não altera nenhuma imagem fixa da Home.</p>}
       <label className="media-file">Imagem<input type="file" accept="image/svg+xml,image/jpeg,image/png,image/webp,image/avif" onChange={onFileChange} required/></label>
       <label>Texto alternativo<input value={alt} onChange={e=>setAlt(e.target.value)} placeholder={slot==='site-logo'?'Kari Do Canto — Artesanato com Afeto':slot==='site-og-image'?'Preview social — Kari Do Canto':'Descrição da imagem'}/></label>
       <button className="btn primary" disabled={loading}>{loading?(slot==='site-logo'?'ATUALIZANDO LOGO…':slot==='site-og-image'?'ATUALIZANDO PREVIEW…':'ENVIANDO…'):(slot==='site-logo'?'ATUALIZAR LOGO':slot==='site-og-image'?'ATUALIZAR PREVIEW':'ADICIONAR IMAGEM')}</button>
       {message&&<p className="form-status success">{message}</p>}{error&&<p className="form-status error">{error}</p>}
     </form>
-    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(supabase,asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':asset.slot==='site-og-image'?'PREVIEW SOCIAL / OPEN GRAPH':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
+    <div className="media-grid">{assets.map(asset=><article className="media-card" key={asset.id}><img src={publicUrl(supabase,asset.bucket,asset.path)} alt={asset.alt_text||asset.filename}/><div className="media-card-body"><span className="tag">{asset.bucket}</span><strong>{asset.slot==='site-logo'?'LOGO DO SITE':asset.slot==='site-og-image'?'PREVIEW SOCIAL / OPEN GRAPH':asset.slot==='404'?'PÁGINA 404 — IMAGEM':(asset.slot||asset.filename)}</strong><small>{asset.alt_text||'Sem texto alternativo'}</small><button className="media-delete" onClick={()=>void remove(asset)} disabled={loading}>EXCLUIR</button></div></article>)}</div>
     {assets.length===0&&<div className="media-empty">Nenhuma imagem cadastrada ainda.</div>}
   </section>;
 }
