@@ -1,5 +1,6 @@
 import './globals.css';
 import './logo.css';
+import './footer-fix.css';
 import type { Metadata, Viewport } from 'next';
 import CloudflareAnalytics from '@/components/CloudflareAnalytics';
 import MobileMenu from '@/components/MobileMenu';
