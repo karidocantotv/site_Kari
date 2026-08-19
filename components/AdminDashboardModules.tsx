@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
+import AdminImageSizeGuide from '@/components/AdminImageSizeGuide';
 
 const AdminMediaManager = dynamic(() => import('@/components/AdminMediaManager'), {
   loading: () => <ModuleLoading label="Carregando gerenciador de imagens…" />,
@@ -45,6 +46,6 @@ export default function AdminDashboardModules() {
 
   return <section>
     <button type="button" className="more admin-back-button" onClick={() => setModule(null)}>← VOLTAR ÀS FERRAMENTAS</button>
-    {module === 'media' ? <AdminMediaManager /> : module === 'youtube' ? <AdminYouTubeManager /> : <AdminNewsletterManager />}
+    {module === 'media' ? <><AdminImageSizeGuide /><AdminMediaManager /></> : module === 'youtube' ? <AdminYouTubeManager /> : <AdminNewsletterManager />}
   </section>;
 }
