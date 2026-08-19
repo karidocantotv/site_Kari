@@ -46,18 +46,31 @@ export default function AdminMediaManager() {
       ? await supabase.from('media_assets').select('id,path').eq('bucket', bucket).eq('slot', slot)
       : { data: [] as { id: string; path: string }[] };
 
-    const {error:insertError}=await supabase.from('media_assets').insert({bucket,path,filename:file.name,alt_text:alt||(isLogo?'Logo Kari Do Canto — Artesanato com Afeto':'Imagem de preview social — Kari Do Canto'),slot:slot||null,width:image?.width??null,height:image?.height??null,mime_type:file.type,size_bytes:file.size});
+    const assetData={
+      bucket,
+      path,
+      filename:file.name,
+      alt_text:alt||(isLogo?'Logo Kari Do Canto — Artesanato com Afeto':isOgImage?'Imagem de preview social — Kari Do Canto':'Descrição da imagem'),
+      slot:slot||null,
+      width:image?.width??null,
+      height:image?.height??null,
+      mime_type:file.type,
+      size_bytes:file.size,
+    };
+
+    const {error:saveError}=isSiteIdentity
+      ? await supabase.from('media_assets').upsert(assetData,{onConflict:'bucket,path'})
+      : await supabase.from('media_assets').insert(assetData);
     image?.close();
 
-    if(insertError){
+    if(saveError){
       if(!isSiteIdentity)await supabase.storage.from(bucket).remove([path]);
-      setError(insertError.message);
+      setError(saveError.message);
     }else{
       if (previousSlotRows?.length) {
         await supabase.from('media_assets').delete().in('id', previousSlotRows.map(row => row.id));
         await supabase.storage.from(bucket).remove(previousSlotRows.map(row => row.path));
       }
-      if(isSiteIdentity)await supabase.from('media_assets').delete().eq('bucket','site').eq('path',path);
       setMessage(
         isLogo
           ? 'Logo atualizado. O site passa a usar este arquivo automaticamente.'
