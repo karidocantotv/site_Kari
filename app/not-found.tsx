@@ -1,2 +1,9 @@
-import Link from 'next/link';
-export default function NotFound(){return <main className="pageHero"><span className="eyebrow">Ops!</span><h1 className="serif">Essa página saiu do ateliê.</h1><p>Talvez o projeto tenha mudado de lugar. Você ainda pode voltar para os cursos, projetos e dicas da Kari.</p><div className="actions" style={{justifyContent:'center'}}><Link className="btn primary" href="/">VOLTAR AO INÍCIO</Link><Link className="btn" href="/blog">VER O BLOG</Link></div></main>}
+import NotFoundContent from '@/components/NotFoundContent';
+import { getPublicSiteMedia } from '@/lib/site-settings';
+
+export default async function NotFound() {
+  const media = await getPublicSiteMedia(['404']);
+  const image = media['404']?.url || '/images/about.webp';
+  const alt = media['404']?.alt || 'Kari Do Canto em seu ateliê de artesanato';
+  return <NotFoundContent image={image} alt={alt} />;
+}
