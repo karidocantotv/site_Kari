@@ -4,10 +4,15 @@ import { unstable_noStore as noStore } from 'next/cache';
 export type PublicSiteSettings = Record<string, string>;
 
 export async function getPublicSiteSettings(keys: string[]): Promise<PublicSiteSettings> {
+  noStore();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return {};
-  const supabase = createClient(url, key);
+  const supabase = createClient(url, key, {
+    global: {
+      fetch: (input, init = {}) => fetch(input, { ...init, cache: 'no-store' }),
+    },
+  });
   const { data } = await supabase.from('site_settings').select('key,value').in('key', keys);
   return Object.fromEntries((data ?? []).map((row) => [row.key, row.value ?? '']));
 }
