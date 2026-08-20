@@ -7,7 +7,7 @@ import NewsletterForm from '@/components/NewsletterForm';
 export default function LanguageAwareFooter({ siteVersion, buildShort }: { siteVersion: string; buildShort: string }) {
   const pathname = usePathname() || '/';
   const es = pathname === '/es' || pathname.startsWith('/es/');
-  const agencyWhatsApp = 'https://wa.me/5512982808333';
+  const agencyEmail = 'mailto:website@riodelaplata.com.br';
   return <>
     <section className="newsletter">
       <div className="container newsletter-inner">
@@ -36,7 +36,7 @@ export default function LanguageAwareFooter({ siteVersion, buildShort }: { siteV
       <div className="container footer-bottom">
         <span>{es ? '© 2026 Kari Do Canto. Todos los derechos reservados.' : '© 2026 Kari Do Canto. Todos os direitos reservados.'}</span>
         <span>{siteVersion} · Build {buildShort}</span>
-        <a href={agencyWhatsApp} target="_blank" rel="noreferrer">{es ? 'Desarrollado con ♥ por Agência Rio de la Plata' : 'Desenvolvido com ♥ pela Agência Rio de la Plata'}</a>
+        <a href={agencyEmail}>{es ? 'Desarrollado con ♥ por Agência Rio de la Plata' : 'Desenvolvido com ♥ pela Agência Rio de la Plata'}</a>
       </div>
     </footer>
   </>;
