@@ -57,7 +57,7 @@ function YoutubeSeoPanel() {
     setWorking(true); setError(''); setProposals([]);
     try {
       const headers = { ...(await authHeaders()), 'Content-Type': 'application/json' };
-      const response = await fetch('/api/admin/youtube-seo', { method: 'POST', headers, body: JSON.stringify({ action: 'analyze', limit: 5, videoIds: videos.slice(0, 5).map((v) => v.id), includeTranscript: false }) });
+      const response = await fetch('/api/admin/youtube-seo', { method: 'POST', headers, body: JSON.stringify({ action: 'analyze', limit: 5, videoIds: videos.slice(0, 5).map((v) => v.id), includeTranscript: true }) });
       const json = await response.json();
       if (!response.ok) throw new Error(json.error);
       setProposals(json.proposals || []);
