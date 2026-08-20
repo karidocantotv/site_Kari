@@ -43,10 +43,14 @@ function YoutubeSeoPanel() {
   useEffect(() => { load(); }, []);
 
   async function connect() {
-    const headers = await authHeaders();
-    const response = await fetch('/api/admin/youtube-seo?action=connect', { headers, redirect: 'manual' });
-    const location = response.headers.get('location');
-    if (location) window.location.href = location;
+    setWorking(true); setError('');
+    try {
+      const headers = await authHeaders();
+      const response = await fetch('/api/admin/youtube-seo?action=connect', { headers });
+      const json = await response.json();
+      if (!response.ok || !json.authUrl) throw new Error(json.error || 'Não foi possível iniciar o OAuth.');
+      window.location.href = json.authUrl;
+    } catch (e: any) { setError(e.message || 'Falha ao conectar.'); setWorking(false); }
   }
 
   async function analyze() {
@@ -82,7 +86,7 @@ function YoutubeSeoPanel() {
 
     {error && <div className="analytics-card" style={{ marginTop: 20 }}><strong>Erro</strong><small>{error}</small></div>}
 
-    {!connected ? <section className="analytics-panel" style={{ marginTop: 24 }}><h2 className="serif">Conectar YouTube</h2><p>Autorize o agente com a conta que administra o canal Kari do Canto. A senha do Google nunca é enviada para este site.</p><button className="btn primary" onClick={connect}>CONECTAR AO YOUTUBE</button></section> : <>
+    {!connected ? <section className="analytics-panel" style={{ marginTop: 24 }}><h2 className="serif">Conectar YouTube</h2><p>Autorize o agente com a conta que administra o canal Kari do Canto. A senha do Google nunca é enviada para este site.</p><button className="btn primary" disabled={working} onClick={connect}>{working ? 'ABRINDO GOOGLE…' : 'CONECTAR AO YOUTUBE'}</button></section> : <>
       <section className="analytics-panel" style={{ marginTop: 24 }}><div className="analytics-panel-head"><div><span className="eyebrow">Canal conectado</span><h2 className="serif">{channel?.title || 'Kari do Canto'}</h2><p>{channel?.id}</p></div><span className="analytics-status is-on"><span className="analytics-dot" /> Conectado</span></div><div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}><button className="btn primary" disabled={working || loading} onClick={analyze}>{working ? 'ANALISANDO…' : 'ANALISAR 5 VÍDEOS'}</button><button className="btn" onClick={load}>ATUALIZAR</button></div></section>
       <section style={{ marginTop: 24 }}><h2 className="serif">Vídeos encontrados</h2>{loading ? <p>Carregando vídeos…</p> : <div className="grid4">{videos.map((video) => <article className="card" key={video.id}><div className="card-body"><span className="tag">{Number(video.statistics?.viewCount || 0).toLocaleString('pt-BR')} visualizações</span><h3>{video.snippet.title}</h3><small>{new Date(video.snippet.publishedAt).toLocaleDateString('pt-BR')}</small></div></article>)}</div>}</section>
       {proposals.length > 0 && <section style={{ marginTop: 32 }}><span className="eyebrow">Revisão</span><h2 className="serif">Propostas de otimização</h2>{proposals.map((item) => <article className="analytics-panel" key={item.video.id} style={{ marginTop: 16 }}><div className="analytics-panel-head"><div><span className="tag">SEO {item.proposal.seoScore}/100</span><h3>{item.video.snippet.title}</h3></div><span className="analytics-status"><span className="analytics-dot" /> {item.transcriptUsed ? 'Com transcrição' : 'Sem transcrição'}</span></div><div className="grid4"><div><small>Título sugerido</small><p><strong>{item.proposal.title}</strong></p></div><div><small>Palavra-chave principal</small><p>{item.proposal.primaryKeyword}</p></div><div><small>Hashtags</small><p>{item.proposal.hashtags.join(' ')}</p></div><div><small>Tags</small><p>{item.proposal.tags.join(', ')}</p></div></div><div style={{ marginTop: 16 }}><small>Descrição sugerida</small><div className="analytics-card" style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{item.proposal.description}</div></div><button className="btn primary" style={{ marginTop: 16 }} disabled={working} onClick={() => publish(item)}>APROVAR E PUBLICAR</button></article>)}</section>}
