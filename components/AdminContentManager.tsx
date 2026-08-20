@@ -10,6 +10,7 @@ type FormState = { slug:string; title:string; category:string; summary:string; c
 
 const FALLBACK_IMAGE: Record<ContentType,string> = { blog:'/images/blog-cestinho.webp', curso:'/images/course-feltro.webp' };
 const BUCKET: Record<ContentType,string> = { blog:'blog', curso:'courses' };
+const MAX_DOWNLOAD_SIZE = 50 * 1024 * 1024;
 
 const emptyForm = (order:number):FormState => ({ slug:'',title:'',category:'',summary:'',content:'',materials:'',steps:'',esTitle:'',esCategory:'',esSummary:'',esContent:'',esMaterials:'',esSteps:'',videoUrl:'',esVideoUrl:'',published:true,sort_order:order });
 
@@ -22,11 +23,11 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
   const [form,setForm] = useState<FormState>(emptyForm(1));
   const [cover,setCover] = useState<File|null>(null);
   const [inside,setInside] = useState<File|null>(null);
-  const [zip,setZip] = useState<File|null>(null);
+  const [downloadFile,setDownloadFile] = useState<File|null>(null);
   const [coverAlt,setCoverAlt] = useState('');
   const [insideAlt,setInsideAlt] = useState('');
   const [currentMedia,setCurrentMedia] = useState<Record<string,string>>({});
-  const [currentZip,setCurrentZip] = useState('');
+  const [currentDownload,setCurrentDownload] = useState('');
   const [loading,setLoading] = useState(false);
   const [message,setMessage] = useState('');
   const [error,setError] = useState('');
@@ -40,12 +41,12 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
   useEffect(()=>{void load();},[type]);
 
   function startNew(){
-    setEditing(null);setForm(emptyForm(Math.max(1,items.length+1)));setCover(null);setInside(null);setZip(null);setCoverAlt('');setInsideAlt('');setCurrentMedia({});setCurrentZip('');setMessage('');setError('');
+    setEditing(null);setForm(emptyForm(Math.max(1,items.length+1)));setCover(null);setInside(null);setDownloadFile(null);setCoverAlt('');setInsideAlt('');setCurrentMedia({});setCurrentDownload('');setMessage('');setError('');
   }
 
   function startEdit(item:Item){
     setEditing(item);setForm({slug:item.slug,title:item.title,category:item.category,summary:item.summary,content:item.content,materials:(item.materials??[]).join('\n'),steps:(item.steps??[]).join('\n'),esTitle:'',esCategory:'',esSummary:'',esContent:'',esMaterials:'',esSteps:'',videoUrl:item.video_url||'',esVideoUrl:'',published:item.published,sort_order:item.sort_order});
-    setCover(null);setInside(null);setZip(null);setCoverAlt('');setInsideAlt('');setCurrentMedia({});setCurrentZip('');setMessage('');setError('');void loadTranslation(item.id);void loadMedia(item.slug);
+    setCover(null);setInside(null);setDownloadFile(null);setCoverAlt('');setInsideAlt('');setCurrentMedia({});setCurrentDownload('');setMessage('');setError('');void loadTranslation(item.id);void loadMedia(item.slug);
   }
 
   async function loadTranslation(id:string){
@@ -61,7 +62,8 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
     const next:Record<string,string>={};
     (data??[]).forEach((row:any)=>{next[row.slot]=supabase.storage.from(BUCKET[type]).getPublicUrl(row.path).data.publicUrl;});
     setCurrentMedia(next);
-    const z=(data??[]).find((row:any)=>row.slot===`blog:${slug}:download`);setCurrentZip(z?.filename||'');
+    const download=(data??[]).find((row:any)=>row.slot===`blog:${slug}:download`);
+    setCurrentDownload(download?.filename||'');
   }
 
   function onImage(event:ChangeEvent<HTMLInputElement>,which:'cover'|'inside'){
@@ -79,11 +81,8 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
     const slotName=`${type==='blog'?'blog':'course'}:${slug}:${slot}`;
     const extension=(file.name.split('.').pop()||'webp').toLowerCase().replace(/[^a-z0-9]/g,'')||'webp';
     const path=`posts/${slug}/${type}-${slot}-${Date.now()}.${extension}`;
-
-    // Upload com URL nova a cada troca. Isso evita que o navegador/CDN devolva a capa antiga.
     const {data:oldRows}=await supabase.from('media_assets').select('path').eq('bucket',bucket).eq('slot',slotName);
     const oldPaths=(oldRows??[]).map((row:any)=>row.path).filter((oldPath:string)=>oldPath!==path);
-
     const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type,cacheControl:'31536000'});
     if(e)throw e;
 
@@ -92,28 +91,26 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
     bitmap?.close();
     if(dbError)throw dbError;
 
-    // Mantém somente a mídia atual para o slot e remove arquivos antigos.
     if(oldPaths.length){
       await supabase.from('media_assets').delete().eq('bucket',bucket).eq('slot',slotName).neq('path',path);
       await supabase.storage.from(bucket).remove(oldPaths);
     }
   }
 
-  async function uploadZip(file:File,slug:string){
+  async function uploadDownload(file:File,slug:string){
     if(!supabase)throw new Error('Supabase não está configurada.');
-    const ok=file.name.toLowerCase().endsWith('.zip')||file.type==='application/zip'||file.type==='application/x-zip-compressed';
-    if(!ok)throw new Error('Selecione somente arquivos ZIP.');
-    if(file.size>50*1024*1024)throw new Error('O arquivo ZIP deve ter no máximo 50 MB.');
+    if(file.size>MAX_DOWNLOAD_SIZE)throw new Error('O arquivo para download deve ter no máximo 50 MB.');
 
     const bucket='blog';
     const slotName=`blog:${slug}:download`;
-    const path=`posts/${slug}/molde-${Date.now()}.zip`;
+    const originalExtension=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
+    const path=`posts/${slug}/download-${Date.now()}.${originalExtension}`;
     const {data:oldRows}=await supabase.from('media_assets').select('path').eq('bucket',bucket).eq('slot',slotName);
     const oldPaths=(oldRows??[]).map((row:any)=>row.path).filter((oldPath:string)=>oldPath!==path);
 
-    const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:false,contentType:'application/zip',cacheControl:'31536000'});
+    const {error:e}=await supabase.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream',cacheControl:'31536000'});
     if(e)throw e;
-    const {error:dbError}=await supabase.from('media_assets').upsert({bucket,path,filename:file.name,slot:slotName,mime_type:'application/zip',size_bytes:file.size},{onConflict:'bucket,path'});
+    const {error:dbError}=await supabase.from('media_assets').upsert({bucket,path,filename:file.name,slot:slotName,mime_type:file.type||'application/octet-stream',size_bytes:file.size},{onConflict:'bucket,path'});
     if(dbError)throw dbError;
 
     if(oldPaths.length){
@@ -125,25 +122,48 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
   async function save(event:FormEvent){
     event.preventDefault();if(!supabase)return;setLoading(true);setMessage('');setError('');
     try{
-      const slug=form.slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');if(!slug||!form.title.trim())throw new Error('Título e slug são obrigatórios.');
-      const materials=form.materials.split('\n').map(s=>s.trim()).filter(Boolean);const steps=form.steps.split('\n').map(s=>s.trim()).filter(Boolean);
+      const slug=form.slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
+      if(!slug||!form.title.trim())throw new Error('Título e slug são obrigatórios.');
+      const materials=form.materials.split('\n').map(s=>s.trim()).filter(Boolean);
+      const steps=form.steps.split('\n').map(s=>s.trim()).filter(Boolean);
       const payload={content_type:type,slug,title:form.title.trim(),category:form.category.trim(),summary:form.summary.trim(),content:form.content.trim(),materials,steps,video_url:form.videoUrl.trim(),published:form.published,sort_order:Number(form.sort_order)||1};
-      const {data,error:e}=await supabase.from('content_items').upsert(payload,{onConflict:'content_type,slug'}).select('id,content_type,slug,title,category,summary,content,materials,steps,published,sort_order,video_url').single();if(e)throw e;
+      const {data,error:e}=await supabase.from('content_items').upsert(payload,{onConflict:'content_type,slug'}).select('id,content_type,slug,title,category,summary,content,materials,steps,published,sort_order,video_url').single();
+      if(e)throw e;
+
       const hasEs=form.esTitle.trim()||form.esSummary.trim()||form.esContent.trim()||form.esMaterials.trim()||form.esSteps.trim()||form.esVideoUrl.trim();
-      if(data&&hasEs){const {error:te}=await supabase.from('content_translations').upsert({content_id:data.id,language:'es-LA',title:form.esTitle.trim(),category:form.esCategory.trim(),summary:form.esSummary.trim(),content:form.esContent.trim(),materials:form.esMaterials.split('\n').map(s=>s.trim()).filter(Boolean),steps:form.esSteps.split('\n').map(s=>s.trim()).filter(Boolean),video_url:form.esVideoUrl.trim(),updated_at:new Date().toISOString()},{onConflict:'content_id,language'});if(te)throw te;}else if(data){await supabase.from('content_translations').delete().eq('content_id',data.id).eq('language','es-LA');}
-      if(cover)await uploadImage(cover,slug,'cover',coverAlt);if(type==='blog'&&inside)await uploadImage(inside,slug,'inside',insideAlt);if(type==='blog'&&zip)await uploadZip(zip,slug);
-      setMessage(`${label[0].toUpperCase()+label.slice(1)} salvo com sucesso.`);setEditing(data as Item);setForm({...form,slug});setCover(null);setInside(null);setZip(null);await load();await loadMedia(slug);
+      if(data&&hasEs){
+        const {error:te}=await supabase.from('content_translations').upsert({content_id:data.id,language:'es-LA',title:form.esTitle.trim(),category:form.esCategory.trim(),summary:form.esSummary.trim(),content:form.esContent.trim(),materials:form.esMaterials.split('\n').map(s=>s.trim()).filter(Boolean),steps:form.esSteps.split('\n').map(s=>s.trim()).filter(Boolean),video_url:form.esVideoUrl.trim(),updated_at:new Date().toISOString()},{onConflict:'content_id,language'});
+        if(te)throw te;
+      }else if(data){
+        await supabase.from('content_translations').delete().eq('content_id',data.id).eq('language','es-LA');
+      }
+
+      if(cover)await uploadImage(cover,slug,'cover',coverAlt);
+      if(type==='blog'&&inside)await uploadImage(inside,slug,'inside',insideAlt);
+      if(type==='blog'&&downloadFile)await uploadDownload(downloadFile,slug);
+
+      setMessage(`${label[0].toUpperCase()+label.slice(1)} salvo com sucesso.`);
+      setEditing(data as Item);setForm({...form,slug});setCover(null);setInside(null);setDownloadFile(null);
+      await load();await loadMedia(slug);
     }catch(e){setError(e instanceof Error?e.message:`Não foi possível salvar o ${label}.`);}finally{setLoading(false);}
   }
 
   async function remove(item:Item){
-    if(!supabase||!confirm(`Excluir este ${label}?`))return;setLoading(true);setError('');const {error:e}=await supabase.from('content_items').delete().eq('id',item.id);if(e)setError(e.message);else{setMessage(`${label[0].toUpperCase()+label.slice(1)} excluído.`);if(editing?.id===item.id)startNew();await load();}setLoading(false);
+    if(!supabase||!confirm(`Excluir este ${label}?`))return;
+    setLoading(true);setError('');
+    const {error:e}=await supabase.from('content_items').delete().eq('id',item.id);
+    if(e)setError(e.message);
+    else{setMessage(`${label[0].toUpperCase()+label.slice(1)} excluído.`);if(editing?.id===item.id)startNew();await load();}
+    setLoading(false);
   }
 
   const sorted=[...items].sort((a,b)=>a.sort_order-b.sort_order);
   return <section className="media-panel">
     <div className="media-head"><div><span className="eyebrow">Conteúdo dinâmico</span><h2 className="serif">{plural[0].toUpperCase()+plural.slice(1)}</h2><p>Cadastre, edite, publique e organize {plural}. A Home e a página da seção passam a carregar automaticamente o conteúdo publicado.</p></div></div>
-    <div className="content-manager-list">{sorted.length===0&&<div className="content-empty"><strong>Nenhum {label} cadastrado.</strong><span>O espaço da Home será mostrado como “Em breve”.</span></div>}{sorted.map(item=><div className="content-row" key={item.id}><div><span className="tag">{item.published?'PUBLICADO':'RASCUNHO'}</span><h3>{item.title}</h3><p>{item.category} · /{type==='blog'?'blog':'cursos'}/{item.slug}</p></div><div className="content-row-actions"><button type="button" className="btn" onClick={()=>startEdit(item)}>EDITAR</button><button type="button" className="more content-delete" onClick={()=>void remove(item)}>EXCLUIR</button></div></div>)}</div>
+    <div className="content-manager-list">
+      {sorted.length===0&&<div className="content-empty"><strong>Nenhum {label} cadastrado.</strong><span>O espaço da Home será mostrado como “Em breve”.</span></div>}
+      {sorted.map(item=><div className="content-row" key={item.id}><div><span className="tag">{item.published?'PUBLICADO':'RASCUNHO'}</span><h3>{item.title}</h3><p>{item.category} · /{type==='blog'?'blog':'cursos'}/{item.slug}</p></div><div className="content-row-actions"><button type="button" className="btn" onClick={()=>startEdit(item)}>EDITAR</button><button type="button" className="more content-delete" onClick={()=>void remove(item)}>EXCLUIR</button></div></div>)}
+    </div>
     <div className="content-editor">
       <div className="content-editor-head"><div><span className="eyebrow">{editing?'Editar':'Novo'}</span><h3 className="serif">{editing?editing.title:`Adicionar ${label}`}</h3></div><button type="button" className="btn" onClick={startNew}>NOVO {label.toUpperCase()}</button></div>
       <form className="settings-form" onSubmit={save}>
@@ -172,7 +192,7 @@ export default function AdminContentManager({ type }: { type: ContentType }) {
         </div>
         <div className="content-media-grid">
           <div><span className="eyebrow">Imagem de capa</span>{editing&&currentMedia[`${type}:${form.slug}:cover`]?<img className="content-media-preview" src={currentMedia[`${type}:${form.slug}:cover`]} alt="Capa atual"/>:<img className="content-media-preview" src={FALLBACK_IMAGE[type]} alt="Imagem padrão"/>}<label>Nova imagem<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e=>onImage(e,'cover')}/></label><label>Texto alternativo<input value={coverAlt} onChange={e=>setCoverAlt(e.target.value)} placeholder="Descrição da imagem"/></label></div>
-          {type==='blog'&&<div><span className="eyebrow">Imagem interna</span>{editing&&currentMedia[`blog:${form.slug}:inside`]?<img className="content-media-preview" src={currentMedia[`blog:${form.slug}:inside`]} alt="Imagem interna atual"/>:<div className="content-media-preview"/>}<label>Nova imagem<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e=>onImage(e,'inside')}/></label><label>Texto alternativo<input value={insideAlt} onChange={e=>setInsideAlt(e.target.value)} placeholder="Descrição da imagem"/></label><label>Molde / arquivo ZIP{currentZip&&<small>Arquivo atual: {currentZip}</small>}<input type="file" accept=".zip,application/zip" onChange={e=>setZip(e.target.files?.[0]??null)}/></label></div>}
+          {type==='blog'&&<div><span className="eyebrow">Imagem interna</span>{editing&&currentMedia[`blog:${form.slug}:inside`]?<img className="content-media-preview" src={currentMedia[`blog:${form.slug}:inside`]} alt="Imagem interna atual"/>:<div className="content-media-preview"/>}<label>Nova imagem<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e=>onImage(e,'inside')}/></label><label>Texto alternativo<input value={insideAlt} onChange={e=>setInsideAlt(e.target.value)} placeholder="Descrição da imagem"/></label><label>Arquivo para download{currentDownload&&<small>Arquivo atual: {currentDownload}</small>}<input type="file" accept="*/*" onChange={e=>setDownloadFile(e.target.files?.[0]??null)}/></label><small>Qualquer tipo de arquivo, até 50 MB.</small></div>}
         </div>
         <div style={{display:'flex',gap:'1rem',alignItems:'center',marginTop:'1.5rem'}}><button className="btn primary" disabled={loading}>{loading?'SALVANDO…':'SALVAR ARTIGO'}</button>{message&&<span>{message}</span>}{error&&<span style={{color:'#a33'}}>{error}</span>}</div>
       </form>
