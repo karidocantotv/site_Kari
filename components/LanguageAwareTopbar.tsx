@@ -8,8 +8,7 @@ export default function LanguageAwareTopbar() {
   return (
     <div className="topbar">
       <div className="container topbar-inner">
-        <span>{es ? '✦ Cursos y proyectos de artesanía con quien enseñó en televisión' : '✦ Cursos e projetos de artesanato com quem ensinou na televisão'}</span>
-        <span className="top-social">
+        <span className="top-language">
           {es ? (
             <>Este sitio también está disponible en: <Link href="/">🇧🇷 Português</Link> 🇵🇹</>
           ) : (
