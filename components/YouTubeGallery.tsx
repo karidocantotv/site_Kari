@@ -8,7 +8,8 @@ type Video = { title: string; videoId: string; enabled?: boolean };
 function YouTubeThumbnail({ videoId, alt, featured = false }: { videoId: string; alt: string; featured?: boolean }) {
   const [failed, setFailed] = useState(false);
   if (failed) return <div className="video-thumb-fallback" role="img" aria-label={alt}><span>▶</span></div>;
-  return <img className={featured ? 'youtube-thumb-image youtube-thumb-featured' : 'youtube-thumb-image'} src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />;
+  const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg?v=${encodeURIComponent(videoId)}`;
+  return <img className={featured ? 'youtube-thumb-image youtube-thumb-featured' : 'youtube-thumb-image'} src={thumbnailUrl} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />;
 }
 
 export default function YouTubeGallery({ videos = [], channel = CHANNEL_URL }: { videos?: Video[]; channel?: string }) {
