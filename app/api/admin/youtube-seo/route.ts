@@ -77,7 +77,7 @@ export async function GET(request: Request) {
       authUrl.searchParams.set('access_type', 'offline');
       authUrl.searchParams.set('prompt', 'consent');
       authUrl.searchParams.set('state', state);
-      const response = NextResponse.redirect(authUrl);
+      const response = NextResponse.json({ authUrl: authUrl.toString() });
       response.cookies.set('youtube_oauth_state', state, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 600, path: '/' });
       return response;
     }
@@ -113,9 +113,9 @@ export async function POST(request: Request) {
         let transcript: string | null = null;
         if (body.includeTranscript) transcript = await getTranscript(accessToken, video.id).catch(() => null);
         const proposal = await generateSeoProposal(video, transcript);
-        const { error } = await db().from('youtube_seo_proposals').upsert({ video_id: video.id, current_title: video.snippet.title, current_description: video.snippet.description || '', current_tags: video.snippet.tags || [], current_category_id: video.snippet.categoryId, transcript_used: Boolean(transcript), source_text: transcript ? transcript.slice(0, 30000) : null, proposal, status: 'pending', updated_at: new Date().toISOString() }, { onConflict: 'video_id' });
+        const { data: saved, error } = await db().from('youtube_seo_proposals').upsert({ video_id: video.id, current_title: video.snippet.title, current_description: video.snippet.description || '', current_tags: video.snippet.tags || [], current_category_id: video.snippet.categoryId, transcript_used: Boolean(transcript), source_text: transcript ? transcript.slice(0, 30000) : null, proposal, status: 'pending', updated_at: new Date().toISOString() }, { onConflict: 'video_id' }).select('id').single();
         if (error) throw new Error(error.message);
-        proposals.push({ video, proposal, transcriptUsed: Boolean(transcript) });
+        proposals.push({ id: saved.id, video, proposal, transcriptUsed: Boolean(transcript) });
       }
       return NextResponse.json({ proposals });
     }
