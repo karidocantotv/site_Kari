@@ -16,15 +16,12 @@ export default function Dashboard() {
     <div className="container">
       <div className="adminbox">
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div>
-            <AdminBrand />
-            <h1 className="serif">Kari Do Canto</h1>
-            <p>Central administrativa para conteúdo, imagens, leads, cursos e métricas do site.</p>
-          </div>
+          <div><AdminBrand /><h1 className="serif">Kari Do Canto</h1><p>Central administrativa para conteúdo, imagens, leads, cursos e métricas do site.</p></div>
           <div className="analytics-status is-on" title={`Build completo: ${buildVersion}`}><span className="analytics-dot" /> {SITE_VERSION} · Build {buildShort}</div>
         </div>
         <AdminDashboardModules />
         <div className="grid4" style={{ marginTop: 24 }}>
+          <Link prefetch={false} className="card admin-link-card" href="/admin/youtube-seo"><div className="card-body"><span className="tag">YouTube</span><h3>SEO do canal</h3><p>Analise vídeos antigos e gere títulos, descrições, tags e hashtags com IA.</p><span className="more">ABRIR SEO DO YOUTUBE →</span></div></Link>
           <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/blog"><div className="card-body"><span className="tag">Conteúdo</span><h3>Blog</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
           <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/projetos"><div className="card-body"><span className="tag">Conteúdo</span><h3>Projetos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
           <Link prefetch={false} className="card admin-link-card" href="/admin/configuracao/cursos"><div className="card-body"><span className="tag">Produtos</span><h3>Cursos</h3><p>Configuração da seção, títulos e apresentação.</p><span className="more">ABRIR CONFIGURAÇÃO →</span></div></Link>
