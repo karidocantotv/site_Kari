@@ -10,9 +10,9 @@ export default function LanguageAwareTopbar() {
       <div className="container topbar-inner">
         <span className="top-language">
           {es ? (
-            <>Este sitio también está disponible en: <a href="https://karidocanto.com.br/">🇧🇷 Português</a> 🇵🇹</>
+            <>Este site também está disponível em: <a href="https://karidocanto.com.br/">🇧🇷 Português</a> 🇵🇹</>
           ) : (
-            <>Este site também está disponível em: <a href="https://karidocanto.com.br/es">🇪🇸 Español</a> 🇦🇷 🇺🇾 🇵🇾 🇨🇱</>
+            <>Este sitio también está disponible en: <a href="https://karidocanto.com.br/es">🇪🇸 Español</a> 🇦🇷 🇺🇾 🇵🇾 🇨🇱</>
           )}
         </span>
       </div>
